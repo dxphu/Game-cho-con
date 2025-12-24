@@ -1,10 +1,9 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const getDentalTips = async () => {
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: "Hãy đưa ra 3 lời khuyên ngắn gọn, vui nhộn và dễ hiểu về việc đánh răng dành cho trẻ em 5 tuổi bằng tiếng Việt.",
@@ -36,6 +35,7 @@ export const getDentalTips = async () => {
 
 export const getToySortingTips = async () => {
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: "Hãy đưa ra 3 lời khuyên ngắn gọn, vui nhộn về việc dọn dẹp đồ chơi sau khi chơi xong dành cho bé 5 tuổi bằng tiếng Việt.",
@@ -66,6 +66,7 @@ export const getToySortingTips = async () => {
 
 export const getPlantCareTips = async () => {
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: "Hãy đưa ra 3 lời khuyên ngắn gọn, vui nhộn về việc chăm sóc cây xanh và bảo vệ môi trường dành cho bé 5 tuổi bằng tiếng Việt.",
@@ -96,6 +97,7 @@ export const getPlantCareTips = async () => {
 
 export const getObstacleCourseTips = async () => {
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: "Hãy đưa ra 3 lời khuyên ngắn gọn, vui nhộn về việc vận động thể chất và rèn luyện kỹ năng vận động thô dành cho bé 5 tuổi bằng tiếng Việt.",
@@ -126,6 +128,7 @@ export const getObstacleCourseTips = async () => {
 
 export const getBallTossTips = async () => {
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: "Hãy đưa ra 3 lời khuyên ngắn gọn, vui nhộn về việc tập ném bóng vào rổ, rèn luyện sự khéo léo và ước lượng khoảng cách dành cho bé 5 tuổi bằng tiếng Việt.",
@@ -164,12 +167,11 @@ export const getCelebrationMessage = async (playerName: string, gameType: string
     case 'balltoss': context = "ném bóng vào rổ cực kỳ chuẩn xác như một vận động viên nhí"; break;
   }
   
-  const prompt = `Hãy viết 1 câu chúc mừng ngắn gọn, khen ngợi bé tên là ${playerName} đã ${context}. Giọng văn vui vẻ, dùng nhiều sticker.`;
-  
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: prompt,
+      contents: `Hãy viết 1 câu chúc mừng ngắn gọn, khen ngợi bé tên là ${playerName} đã ${context}. Giọng văn vui vẻ, dùng nhiều sticker.`,
     });
     return response.text;
   } catch (error) {
