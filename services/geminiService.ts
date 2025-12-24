@@ -94,12 +94,74 @@ export const getPlantCareTips = async () => {
   }
 };
 
+export const getObstacleCourseTips = async () => {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: "Hãy đưa ra 3 lời khuyên ngắn gọn, vui nhộn về việc vận động thể chất và rèn luyện kỹ năng vận động thô dành cho bé 5 tuổi bằng tiếng Việt.",
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              title: { type: Type.STRING },
+              content: { type: Type.STRING }
+            },
+            required: ["title", "content"]
+          }
+        }
+      }
+    });
+    return JSON.parse(response.text);
+  } catch (error) {
+    return [
+      { title: "Bé khỏe như lực sĩ", content: "Vận động mỗi ngày giúp đôi chân bé thêm khỏe mạnh đấy!" },
+      { title: "Khéo léo như chú mèo", content: "Đi thăng bằng trên đường thẳng giúp bé dẻo dai hơn." },
+      { title: "Năng lượng tích cực", content: "Vui chơi vận động giúp bé ngủ ngon và cao lớn nhanh hơn." }
+    ];
+  }
+};
+
+export const getBallTossTips = async () => {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: "Hãy đưa ra 3 lời khuyên ngắn gọn, vui nhộn về việc tập ném bóng vào rổ, rèn luyện sự khéo léo và ước lượng khoảng cách dành cho bé 5 tuổi bằng tiếng Việt.",
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              title: { type: Type.STRING },
+              content: { type: Type.STRING }
+            },
+            required: ["title", "content"]
+          }
+        }
+      }
+    });
+    return JSON.parse(response.text);
+  } catch (error) {
+    return [
+      { title: "Mắt nhìn chuẩn xác", content: "Hãy nhìn thẳng vào rổ trước khi ném nhé!" },
+      { title: "Đôi tay khéo léo", content: "Dùng lực vừa phải để bạn bóng rơi đúng vào rổ nha." },
+      { title: "Kiên trì tập luyện", content: "Ném chưa trúng cũng không sao, lần sau bé sẽ làm tốt hơn!" }
+    ];
+  }
+};
+
 export const getCelebrationMessage = async (playerName: string, gameType: string = 'dental') => {
   let context = "";
   switch(gameType) {
     case 'dental': context = "hoàn thành xuất sắc việc đánh răng sạch sẽ"; break;
     case 'toys': context = "dọn dẹp đồ chơi thật ngăn nắp"; break;
     case 'plants': context = "chăm sóc cây xanh lớn nhanh rực rỡ"; break;
+    case 'obstacle': context = "vượt qua thử thách vận động tại gia thật dũng cảm và khéo léo"; break;
+    case 'balltoss': context = "ném bóng vào rổ cực kỳ chuẩn xác như một vận động viên nhí"; break;
   }
   
   const prompt = `Hãy viết 1 câu chúc mừng ngắn gọn, khen ngợi bé tên là ${playerName} đã ${context}. Giọng văn vui vẻ, dùng nhiều sticker.`;
@@ -111,6 +173,6 @@ export const getCelebrationMessage = async (playerName: string, gameType: string
     });
     return response.text;
   } catch (error) {
-    return `Hoan hô ${playerName}! Con thật là một em bé tuyệt vời! ✨🌱`;
+    return `Hoan hô ${playerName}! Con thật là một em bé tuyệt vời! ✨🏆`;
   }
 };

@@ -4,6 +4,8 @@ import { GameInfo } from './types';
 import ToothGame from './games/ToothGame';
 import ToySortingGame from './games/ToySortingGame';
 import PlantWateringGame from './games/PlantWateringGame';
+import ObstacleCourseGame from './games/ObstacleCourseGame';
+import BallTossGame from './games/BallTossGame';
 
 const SafeIcon: React.FC<{ src: string; fallback: string; className?: string }> = ({ src, fallback, className }) => {
   const [error, setError] = useState(false);
@@ -35,6 +37,22 @@ const GAMES: GameInfo[] = [
     fallback: '🪴',
     color: 'bg-green-400',
     description: 'Chăm sóc môi trường xung quanh.'
+  },
+  {
+    id: 'obstacle',
+    title: 'Vượt Chướng Ngại Vật',
+    icon: 'https://img.icons8.com/color/96/running-rabbit.png',
+    fallback: '🐇',
+    color: 'bg-purple-400',
+    description: 'Rèn luyện kỹ năng vận động thô tại gia.'
+  },
+  {
+    id: 'balltoss',
+    title: 'Ném Bóng Vào Rổ',
+    icon: 'https://img.icons8.com/color/96/basketball-net.png',
+    fallback: '🏀',
+    color: 'bg-yellow-500',
+    description: 'Rèn luyện sự khéo léo và khả năng ước lượng.'
   }
 ];
 
@@ -49,6 +67,8 @@ const App: React.FC = () => {
       case 'tooth': return <ToothGame />;
       case 'toys': return <ToySortingGame />;
       case 'plants': return <PlantWateringGame />;
+      case 'obstacle': return <ObstacleCourseGame />;
+      case 'balltoss': return <BallTossGame />;
       default: return null;
     }
   };
