@@ -1,12 +1,42 @@
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GameState, DentalTip } from '../types';
 import { getPlantCareTips, getCelebrationMessage } from '../services/geminiService';
+
+const SafeImage: React.FC<{ src: string; alt: string; className?: string; fallbackEmoji: string }> = ({ src, alt, className, fallbackEmoji }) => {
+  const [isError, setIsError] = useState(false);
+  
+  return (
+    <div className={`${className} flex items-center justify-center relative`}>
+      {!isError ? (
+        <img 
+          src={src} 
+          alt={alt} 
+          className="w-full h-full object-contain" 
+          onError={() => setIsError(true)} 
+          draggable="false" 
+        />
+      ) : (
+        <span className="text-6xl drop-shadow-md">{fallbackEmoji}</span>
+      )}
+    </div>
+  );
+};
+
+const PLANT_VARIANTS = [
+  { id: 'sunflower', emoji: '🌻', name: 'Hoa Hướng Dương' },
+  { id: 'cactus', emoji: '🌵', name: 'Cây Xương Rồng' },
+  { id: 'rose', emoji: '🌹', name: 'Hoa Hồng' },
+  { id: 'flower-pot', emoji: '🪴', name: 'Cây Trong Chậu' },
+  { id: 'tulip', emoji: '🌷', name: 'Hoa Tulip' },
+  { id: 'deciduous-tree', emoji: '🌳', name: 'Cây Xanh' }
+];
 
 const PlantWateringGame: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>('START');
   const [playerName, setPlayerName] = useState('');
-  const [growth, setGrowth] = useState(0); // 0 to 100
+  const [growth, setGrowth] = useState(0); 
+  const [currentVariant, setCurrentVariant] = useState(PLANT_VARIANTS[0]);
   const [canPos, setCanPos] = useState({ x: 50, y: 30 });
   const [isWatering, setIsWatering] = useState(false);
   const [tips, setTips] = useState<DentalTip[]>([]);
@@ -17,6 +47,11 @@ const PlantWateringGame: React.FC = () => {
   const handleStart = (e: React.FormEvent) => {
     e.preventDefault();
     if (!playerName.trim()) return;
+    
+    // Ngẫu nhiên hóa loại cây cho lượt này
+    const randomVariant = PLANT_VARIANTS[Math.floor(Math.random() * PLANT_VARIANTS.length)];
+    setCurrentVariant(randomVariant);
+    
     setGameState('PLAYING');
     setGrowth(0);
   };
@@ -27,13 +62,7 @@ const PlantWateringGame: React.FC = () => {
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     setCanPos({ x, y });
-    
-    // Check if over the plant area (center)
-    if (x > 35 && x < 65 && y > 30 && y < 70) {
-      setIsWatering(true);
-    } else {
-      setIsWatering(false);
-    }
+    setIsWatering(x > 30 && x < 70 && y > 20 && y < 85);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -43,22 +72,14 @@ const PlantWateringGame: React.FC = () => {
     const x = ((touch.clientX - rect.left) / rect.width) * 100;
     const y = ((touch.clientY - rect.top) / rect.height) * 100;
     setCanPos({ x, y });
-    
-    if (x > 35 && x < 65 && y > 30 && y < 70) {
-      setIsWatering(true);
-    } else {
-      setIsWatering(false);
-    }
+    setIsWatering(x > 30 && x < 70 && y > 20 && y < 85);
   };
 
   useEffect(() => {
     let interval: any;
     if (isWatering && gameState === 'PLAYING') {
       interval = setInterval(() => {
-        setGrowth(prev => {
-          if (prev >= 100) return 100;
-          return prev + 1;
-        });
+        setGrowth(prev => Math.min(prev + 1.2, 100));
       }, 50);
     }
     return () => clearInterval(interval);
@@ -87,12 +108,6 @@ const PlantWateringGame: React.FC = () => {
     }
   };
 
-  const getPlantImage = () => {
-    if (growth < 30) return 'https://img.icons8.com/color/144/sprout.png';
-    if (growth < 70) return 'https://img.icons8.com/color/144/potted-plant.png';
-    return 'https://img.icons8.com/color/144/flower-pot.png';
-  };
-
   return (
     <div 
       className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-b from-sky-50 to-green-50"
@@ -102,9 +117,9 @@ const PlantWateringGame: React.FC = () => {
       onMouseLeave={() => setIsWatering(false)}
     >
       {gameState === 'START' && (
-        <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-xl text-center border-t-8 border-green-400 z-10">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-xl text-center border-t-8 border-green-400 z-10 mx-4">
           <h1 className="text-4xl font-bold text-green-600 mb-2">Tưới Cây Xanh</h1>
-          <p className="text-slate-500 mb-8">Bé hãy giúp mầm nhỏ lớn thành hoa xinh nhé!</p>
+          <p className="text-slate-500 mb-8">Mỗi lượt chơi sẽ là một loại cây bí mật nhé!</p>
           <form onSubmit={handleStart} className="space-y-6">
             <input 
               type="text" 
@@ -115,7 +130,7 @@ const PlantWateringGame: React.FC = () => {
               required
             />
             <button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl shadow-lg transition-all text-xl">
-              BẮT ĐẦU CHƠI
+              KHÁM PHÁ CÂY MỚI
             </button>
           </form>
         </div>
@@ -123,82 +138,63 @@ const PlantWateringGame: React.FC = () => {
 
       {gameState === 'PLAYING' && (
         <div className="w-full h-full relative flex flex-col items-center justify-center cursor-none">
-          {/* Clouds */}
-          <div className="absolute top-10 left-10 opacity-30 animate-float">
-            <img src="https://img.icons8.com/color/96/cloud.png" alt="cloud" />
-          </div>
-          <div className="absolute top-20 right-20 opacity-30 animate-float" style={{ animationDelay: '1.5s' }}>
-            <img src="https://img.icons8.com/color/96/cloud.png" alt="cloud" />
-          </div>
-
-          {/* Sun */}
-          <div className="absolute top-5 left-1/2 -translate-x-1/2 opacity-20">
-             <img src="https://img.icons8.com/color/144/sun.png" className="animate-spin-slow" alt="sun" />
-          </div>
-
-          {/* Growth Meter */}
-          <div className="absolute top-8 w-64 h-6 bg-white rounded-full shadow-inner overflow-hidden border-2 border-green-200">
+          {/* Thanh sức sống */}
+          <div className="absolute top-8 w-64 h-8 bg-white rounded-full shadow-inner overflow-hidden border-2 border-green-200">
             <div 
               className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-300"
               style={{ width: `${growth}%` }}
             />
-            <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-green-800 uppercase tracking-widest">
-              Sức sống: {growth}%
+            <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-green-800 uppercase tracking-widest">
+              Sức sống: {Math.floor(growth)}%
             </div>
           </div>
 
-          {/* The Plant */}
-          <div className="relative mt-20 transition-all duration-500 transform" style={{ scale: `${0.8 + (growth / 200)}` }}>
-            <img 
-              src={getPlantImage()} 
+          <div className="relative mt-20 transition-all duration-500 transform" style={{ transform: `scale(${0.9 + (growth / 150)})` }}>
+            <SafeImage 
+              src={growth < 30 ? 'https://img.icons8.com/color/96/seedling.png' : (growth < 70 ? 'https://img.icons8.com/color/96/potted-plant.png' : `https://img.icons8.com/color/96/${currentVariant.id}.png`)}
               alt="plant" 
-              className={`w-48 h-48 md:w-64 md:h-64 object-contain ${isWatering ? 'animate-pulse' : ''}`}
+              className={`w-48 h-48 md:w-64 md:h-64 ${isWatering ? 'animate-pulse' : ''}`}
+              fallbackEmoji={growth < 70 ? "🌱" : currentVariant.emoji}
             />
             {isWatering && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full flex justify-center pointer-events-none">
-                {[...Array(5)].map((_, i) => (
-                  <div 
-                    key={i} 
-                    className="w-2 h-6 bg-blue-400 rounded-full mx-1 animate-bounce"
-                    style={{ animationDelay: `${i * 0.1}s`, opacity: 0.6 }}
-                  />
+              <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-full h-full flex justify-center pointer-events-none">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="w-1.5 h-6 bg-blue-300 rounded-full mx-1 animate-bounce" style={{ animationDelay: `${i * 0.1}s` }} />
                 ))}
               </div>
             )}
           </div>
 
-          {/* Watering Can Cursor */}
+          {/* Bình tưới */}
           <div 
-            className="fixed pointer-events-none z-50 transition-transform duration-100"
+            className="fixed pointer-events-none z-50 transition-transform duration-75"
             style={{ 
               left: `${(canPos.x * (containerRef.current?.clientWidth || 0)) / 100 + (containerRef.current?.getBoundingClientRect().left || 0)}px`,
               top: `${(canPos.y * (containerRef.current?.clientHeight || 0)) / 100 + (containerRef.current?.getBoundingClientRect().top || 0)}px`,
-              transform: `translate(-50%, -50%) rotate(${isWatering ? '-30deg' : '0deg'})`
+              transform: `translate(-50%, -50%) rotate(${isWatering ? '-35deg' : '0deg'})`
             }}
           >
-            <img 
+            <SafeImage 
               src="https://img.icons8.com/color/96/watering-can.png" 
-              className="w-24 h-24 drop-shadow-xl" 
+              className="w-24 h-24 drop-shadow-2xl" 
               alt="Watering Can" 
+              fallbackEmoji="🚿"
             />
           </div>
 
-          <div className="mt-12 text-green-700 font-bold bg-white/50 backdrop-blur px-6 py-2 rounded-full border border-green-200">
-             Hãy di chuyển bình để tưới nước cho cây nhé!
+          <div className="mt-12 text-green-700 font-bold bg-white/60 backdrop-blur-sm px-8 py-3 rounded-full border border-green-200 animate-bounce shadow-sm">
+             Tưới nước cho {currentVariant.name} nào! 💦
           </div>
         </div>
       )}
 
       {gameState === 'FINISHED' && (
-        <div className="max-w-2xl w-full bg-white rounded-3xl p-8 shadow-xl text-center border-b-8 border-green-400 z-10">
+        <div className="max-w-2xl w-full bg-white rounded-3xl p-8 shadow-xl text-center border-b-8 border-green-400 z-10 mx-4 overflow-y-auto max-h-[90vh]">
           <div className="relative mb-6">
-            <img src="https://img.icons8.com/color/144/flower-pot.png" className="mx-auto animate-bounce" alt="Grown Plant" />
-            <div className="absolute inset-0 bg-yellow-200 rounded-full blur-3xl opacity-30 -z-10" />
+            <SafeImage src={`https://img.icons8.com/color/144/${currentVariant.id}.png`} className="w-32 h-32 mx-auto animate-bounce" alt="Winner" fallbackEmoji={currentVariant.emoji} />
           </div>
-          <h2 className="text-3xl font-bold text-green-600 mb-2">Cây đã nở hoa rồi!</h2>
-          <div className="min-h-[3rem] flex items-center justify-center mb-6">
-            {loading ? "..." : <p className="text-lg text-slate-700 italic">{celebrationMsg}</p>}
-          </div>
+          <h2 className="text-3xl font-bold text-green-600 mb-2">Bé thật mát tay!</h2>
+          <p className="text-lg text-slate-700 italic mb-6">{loading ? "Đang chờ quà..." : celebrationMsg}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             {tips.map((tip, idx) => (
               <div key={idx} className="bg-green-50 p-4 rounded-2xl text-left border-l-4 border-green-400">
@@ -207,7 +203,7 @@ const PlantWateringGame: React.FC = () => {
               </div>
             ))}
           </div>
-          <button onClick={() => setGameState('START')} className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-12 rounded-2xl shadow-lg transition-all text-xl">CHƠI LẠI</button>
+          <button onClick={() => setGameState('START')} className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-12 rounded-2xl shadow-lg transition-all text-xl">CHƠI TIẾP</button>
         </div>
       )}
     </div>

@@ -17,12 +17,12 @@ const ToothGame: React.FC = () => {
   const initGame = useCallback(() => {
     const newStains: Stain[] = [];
     const types: ('bacteria' | 'stain' | 'food')[] = ['bacteria', 'stain', 'food'];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 22; i++) {
       newStains.push({
         id: i,
-        x: 30 + Math.random() * 40,
-        y: 20 + Math.random() * 65,
-        size: 15 + Math.random() * 25,
+        x: 25 + Math.random() * 50,
+        y: 15 + Math.random() * 75,
+        size: 20 + Math.random() * 30,
         isCleaned: false,
         type: types[Math.floor(Math.random() * types.length)],
       });
@@ -125,7 +125,7 @@ const ToothGame: React.FC = () => {
       {gameState === 'PLAYING' && (
         <div className="relative flex flex-col items-center">
           <div className="absolute top-[-80px] text-center w-max bg-white/80 backdrop-blur px-6 py-2 rounded-full shadow-sm">
-            <span className="text-xl font-bold text-blue-600">Còn {stains.filter(s => !s.isCleaned).length} vết bẩn ✨</span>
+            <span className="text-xl font-bold text-blue-600">✨ Còn {stains.filter(s => !s.isCleaned).length} con vi khuẩn!</span>
           </div>
           <Tooth stains={stains} onClean={cleanStain} brushPos={brushPos} />
           <div 
@@ -135,14 +135,14 @@ const ToothGame: React.FC = () => {
               top: `${(brushPos.y * (containerRef.current?.clientHeight || 0)) / 100 + (containerRef.current?.getBoundingClientRect().top || 0)}px`
             }}
           >
-            <img src="https://img.icons8.com/color/96/toothbrush.png" className="w-20 h-20 rotate-[15deg]" alt="Brush" />
+            <img src="https://img.icons8.com/fluency/96/toothbrush.png" className="w-20 h-20 rotate-[15deg] drop-shadow-lg" alt="Brush" />
           </div>
         </div>
       )}
 
       {gameState === 'FINISHED' && (
         <div className="max-w-2xl w-full bg-white rounded-3xl p-8 shadow-xl text-center border-b-8 border-green-400">
-          <img src="https://img.icons8.com/color/144/medal.png" className="mx-auto mb-4 animate-bounce" alt="Winner" />
+          <img src="https://img.icons8.com/fluency/96/medal.png" className="w-24 h-24 mx-auto mb-4 animate-bounce" alt="Winner" />
           <h2 className="text-3xl font-bold text-green-600 mb-2">Tuyệt vời quá!</h2>
           <p className="text-lg text-slate-700 italic mb-6">{loading ? "..." : celebrationMsg}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -153,7 +153,7 @@ const ToothGame: React.FC = () => {
               </div>
             ))}
           </div>
-          <button onClick={restart} className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-12 rounded-2xl shadow-lg transition-all text-xl">CHƠI LẠI</button>
+          <button onClick={restart} className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-12 rounded-2xl shadow-lg transition-all text-xl">CHƠI TIẾP</button>
         </div>
       )}
     </div>

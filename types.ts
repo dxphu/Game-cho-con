@@ -19,6 +19,7 @@ export interface GameInfo {
   id: string;
   title: string;
   icon: string;
+  fallback?: string;
   color: string;
   description: string;
 }

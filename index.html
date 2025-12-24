@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bé Tập Đánh Răng</title>
+    <title>Bé Tập Đánh Răng & Vui Chơi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -13,15 +13,19 @@
         overflow: hidden;
         user-select: none;
       }
-      .cursor-brush {
-        cursor: url('https://img.icons8.com/color/48/toothbrush.png'), auto;
-      }
       @keyframes float {
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-10px); }
       }
       .animate-float {
         animation: float 3s ease-in-out infinite;
+      }
+      @keyframes spin-slow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .animate-spin-slow {
+        animation: spin-slow 12s linear infinite;
       }
       .sparkle {
         pointer-events: none;
