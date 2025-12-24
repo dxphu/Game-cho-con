@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, Stain, DentalTip } from '../types';
 import Tooth from '../components/Tooth';
@@ -8,7 +7,7 @@ const ToothGame: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>('START');
   const [playerName, setPlayerName] = useState('');
   const [stains, setStains] = useState<Stain[]>([]);
-  const [brushPos, setBrushPos] = useState({ x: 0, y: 0 });
+  const [brushPos, setBrushPos] = useState({ x: 50, y: 50 });
   const [tips, setTips] = useState<DentalTip[]>([]);
   const [celebrationMsg, setCelebrationMsg] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,12 +16,12 @@ const ToothGame: React.FC = () => {
   const initGame = useCallback(() => {
     const newStains: Stain[] = [];
     const types: ('bacteria' | 'stain' | 'food')[] = ['bacteria', 'stain', 'food'];
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < 18; i++) {
       newStains.push({
         id: i,
         x: 25 + Math.random() * 50,
-        y: 15 + Math.random() * 75,
-        size: 20 + Math.random() * 30,
+        y: 15 + Math.random() * 70,
+        size: 24 + Math.random() * 32, // To hơn một chút cho mobile dễ bấm
         isCleaned: false,
         type: types[Math.floor(Math.random() * types.length)],
       });
@@ -49,7 +48,7 @@ const ToothGame: React.FC = () => {
       setTips(tipsData);
       setCelebrationMsg(msg);
     } catch (e) {
-      console.error("Error ending game", e);
+      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -57,103 +56,94 @@ const ToothGame: React.FC = () => {
 
   useEffect(() => {
     if (gameState === 'PLAYING' && stains.length > 0) {
-      const allCleaned = stains.every(s => s.isCleaned);
-      if (allCleaned) {
+      if (stains.every(s => s.isCleaned)) {
         handleWin();
       }
     }
   }, [stains, gameState, handleWin]);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const updateBrushPos = (clientX: number, clientY: number) => {
     if (gameState !== 'PLAYING' || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setBrushPos({ x, y });
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (gameState !== 'PLAYING' || !containerRef.current) return;
-    const touch = e.touches[0];
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = ((touch.clientX - rect.left) / rect.width) * 100;
-    const y = ((touch.clientY - rect.top) / rect.height) * 100;
+    const x = ((clientX - rect.left) / rect.width) * 100;
+    const y = ((clientY - rect.top) / rect.height) * 100;
     setBrushPos({ x, y });
   };
 
   const cleanStain = useCallback((id: number) => {
-    setStains(prev => {
-      const target = prev.find(s => s.id === id);
-      if (!target || target.isCleaned) return prev;
-      return prev.map(s => s.id === id ? { ...s, isCleaned: true } : s);
-    });
+    setStains(prev => prev.map(s => s.id === id ? { ...s, isCleaned: true } : s));
   }, []);
-
-  const restart = () => {
-    setGameState('START');
-    setStains([]);
-    setCelebrationMsg('');
-  };
 
   return (
     <div 
-      className={`w-full h-full flex flex-col items-center justify-center p-4 transition-colors duration-1000 ${gameState === 'PLAYING' ? 'cursor-none' : ''}`}
-      onMouseMove={handleMouseMove}
-      onTouchMove={handleTouchMove}
       ref={containerRef}
+      className={`w-full h-full flex flex-col items-center justify-center p-4 relative ${gameState === 'PLAYING' ? 'cursor-none touch-none' : ''}`}
+      onMouseMove={(e) => updateBrushPos(e.clientX, e.clientY)}
+      onTouchMove={(e) => updateBrushPos(e.touches[0].clientX, e.touches[0].clientY)}
     >
       {gameState === 'START' && (
-        <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-xl text-center border-t-8 border-blue-400">
-          <h1 className="text-4xl font-bold text-blue-600 mb-2">Bé Tập Đánh Răng</h1>
-          <p className="text-slate-500 mb-8">Hãy giúp bạn Răng trắng sáng trở lại nhé!</p>
-          <form onSubmit={handleStart} className="space-y-6">
+        <div className="max-w-md w-full bg-white rounded-3xl p-6 md:p-10 shadow-xl text-center border-t-8 border-blue-400 z-10 animate-float">
+          <h1 className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">Bé Tập Đánh Răng</h1>
+          <p className="text-slate-500 mb-8 text-sm md:text-base">Xua đuổi vi khuẩn cho bạn Răng xinh!</p>
+          <form onSubmit={handleStart} className="space-y-4">
             <input 
               type="text" 
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
-              placeholder="Nhập tên bé..."
-              className="w-full px-4 py-3 rounded-2xl bg-blue-50 border-2 border-transparent focus:border-blue-400 focus:outline-none text-lg"
+              placeholder="Tên của bé là gì nhỉ?"
+              className="w-full px-5 py-4 rounded-2xl bg-blue-50 border-2 border-transparent focus:border-blue-400 focus:outline-none text-lg text-center font-bold"
               required
             />
-            <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg transform active:scale-95 transition-all text-xl">
-              BẮT ĐẦU CHƠI
+            <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all text-xl">
+              CHƠI NGAY ✨
             </button>
           </form>
         </div>
       )}
 
       {gameState === 'PLAYING' && (
-        <div className="relative flex flex-col items-center">
-          <div className="absolute top-[-80px] text-center w-max bg-white/80 backdrop-blur px-6 py-2 rounded-full shadow-sm">
-            <span className="text-xl font-bold text-blue-600">✨ Còn {stains.filter(s => !s.isCleaned).length} con vi khuẩn!</span>
+        <div className="relative flex flex-col items-center w-full max-w-lg">
+          <div className="mb-6 bg-white/90 backdrop-blur px-6 py-2 rounded-full shadow-md border border-blue-100 animate-pulse">
+            <span className="text-lg md:text-xl font-bold text-blue-600">🦠 Còn {stains.filter(s => !s.isCleaned).length} bạn vi khuẩn</span>
           </div>
-          <Tooth stains={stains} onClean={cleanStain} brushPos={brushPos} />
+          
+          <div className="w-full aspect-square flex justify-center items-center">
+             <Tooth stains={stains} onClean={cleanStain} brushPos={brushPos} />
+          </div>
+
           <div 
-            className="pointer-events-none fixed z-50 transform -translate-x-1/2 -translate-y-1/2"
+            className="fixed pointer-events-none z-[60] -translate-x-1/2 -translate-y-1/2"
             style={{ 
               left: `${(brushPos.x * (containerRef.current?.clientWidth || 0)) / 100 + (containerRef.current?.getBoundingClientRect().left || 0)}px`,
               top: `${(brushPos.y * (containerRef.current?.clientHeight || 0)) / 100 + (containerRef.current?.getBoundingClientRect().top || 0)}px`
             }}
           >
-            <img src="https://img.icons8.com/fluency/96/toothbrush.png" className="w-20 h-20 rotate-[15deg] drop-shadow-lg" alt="Brush" />
+            <img src="https://img.icons8.com/fluency/144/toothbrush.png" className="w-24 h-24 md:w-32 md:h-32 rotate-[15deg] drop-shadow-2xl" alt="Brush" />
           </div>
         </div>
       )}
 
       {gameState === 'FINISHED' && (
-        <div className="max-w-2xl w-full bg-white rounded-3xl p-8 shadow-xl text-center border-b-8 border-green-400">
-          <img src="https://img.icons8.com/fluency/96/medal.png" className="w-24 h-24 mx-auto mb-4 animate-bounce" alt="Winner" />
-          <h2 className="text-3xl font-bold text-green-600 mb-2">Tuyệt vời quá!</h2>
-          <p className="text-lg text-slate-700 italic mb-6">{loading ? "..." : celebrationMsg}</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="max-w-2xl w-full bg-white rounded-3xl p-6 md:p-8 shadow-2xl text-center border-b-8 border-green-400 z-50 overflow-y-auto max-h-[85vh] custom-scrollbar">
+          <img src="https://img.icons8.com/color/144/medal.png" className="w-24 h-24 mx-auto mb-4 animate-bounce" alt="Winner" />
+          <h2 className="text-2xl md:text-3xl font-bold text-green-600 mb-2">Quá giỏi luôn!</h2>
+          <p className="text-base md:text-lg text-slate-700 italic mb-6 leading-relaxed">
+            {loading ? "Đang chờ quà..." : celebrationMsg}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
             {tips.map((tip, idx) => (
-              <div key={idx} className="bg-blue-50 p-4 rounded-2xl text-left border-l-4 border-blue-400">
-                <h3 className="font-bold text-blue-600 mb-1">{tip.title}</h3>
-                <p className="text-sm text-slate-600">{tip.content}</p>
+              <div key={idx} className="bg-blue-50 p-4 rounded-2xl text-left border-l-4 border-blue-400 shadow-sm">
+                <h3 className="font-bold text-blue-600 text-sm mb-1">{tip.title}</h3>
+                <p className="text-[12px] md:text-sm text-slate-600">{tip.content}</p>
               </div>
             ))}
           </div>
-          <button onClick={restart} className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-12 rounded-2xl shadow-lg transition-all text-xl">CHƠI TIẾP</button>
+          <button 
+            onClick={() => setGameState('START')} 
+            className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-12 rounded-2xl shadow-lg transition-all text-xl hover:scale-105"
+          >
+            CHƠI TIẾP 🔄
+          </button>
         </div>
       )}
     </div>

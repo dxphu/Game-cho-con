@@ -2,7 +2,7 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Bé Tập Đánh Răng & Vui Chơi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
@@ -11,6 +11,8 @@
         font-family: 'Quicksand', sans-serif;
         overflow: hidden;
         user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
       }
       @keyframes float {
         0%, 100% { transform: translateY(0); }
@@ -19,21 +21,15 @@
       .animate-float {
         animation: float 3s ease-in-out infinite;
       }
-      @keyframes spin-slow {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
       }
-      .animate-spin-slow {
-        animation: spin-slow 12s linear infinite;
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
       }
-      .sparkle {
-        pointer-events: none;
-        position: absolute;
-        animation: sparkle-anim 0.8s ease-out forwards;
-      }
-      @keyframes sparkle-anim {
-        0% { transform: scale(0) rotate(0deg); opacity: 1; }
-        100% { transform: scale(1.5) rotate(180deg); opacity: 0; }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
       }
     </style>
   <script type="importmap">
