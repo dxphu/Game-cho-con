@@ -131,7 +131,7 @@ export const getBallTossTips = async () => {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: "Hãy đưa ra 3 lời khuyên ngắn gọn, vui nhộn về việc tập ném bóng vào rổ, rèn luyện sự khéo léo và ước lượng khoảng cách dành cho bé 5 tuổi bằng tiếng Việt.",
+      contents: "Hãy đưa ra 3 lời khuyên ngắn gọn, vui nhộn về việc ném bóng vào rổ dành cho bé 5 tuổi bằng tiếng Việt.",
       config: {
         responseMimeType: "application/json",
         responseSchema: {
@@ -157,14 +157,46 @@ export const getBallTossTips = async () => {
   }
 };
 
+export const getRolePlayTips = async (role: string) => {
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `Hãy đưa ra 3 bài học ngắn gọn, vui nhộn về kỹ năng xã hội khi bé đóng vai làm ${role} (bằng tiếng Việt, dành cho bé 5 tuổi).`,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              title: { type: Type.STRING },
+              content: { type: Type.STRING }
+            },
+            required: ["title", "content"]
+          }
+        }
+      }
+    });
+    return JSON.parse(response.text);
+  } catch (error) {
+    return [
+      { title: "Giao tiếp tự tin", content: "Nói lời chào và cảm ơn giúp mọi người yêu quý bé hơn." },
+      { title: "Giúp đỡ mọi người", content: "Quan tâm và giúp đỡ bạn bè là hành động của một bé ngoan." },
+      { title: "Học cách chia sẻ", content: "Cùng chơi và chia sẻ đồ dùng với bạn sẽ vui hơn rất nhiều." }
+    ];
+  }
+};
+
 export const getCelebrationMessage = async (playerName: string, gameType: string = 'dental') => {
   let context = "";
   switch(gameType) {
     case 'dental': context = "hoàn thành xuất sắc việc đánh răng sạch sẽ"; break;
     case 'toys': context = "dọn dẹp đồ chơi thật ngăn nắp"; break;
     case 'plants': context = "chăm sóc cây xanh lớn nhanh rực rỡ"; break;
-    case 'obstacle': context = "vượt qua thử thách vận động tại gia thật dũng cảm và khéo léo"; break;
-    case 'balltoss': context = "ném bóng vào rổ cực kỳ chuẩn xác như một vận động viên nhí"; break;
+    case 'obstacle': context = "vượt qua thử thách vận động tại gia dũng cảm"; break;
+    case 'balltoss': context = "ném bóng vào rổ cực kỳ chuẩn xác"; break;
+    case 'roleplay': context = "hóa thân xuất sắc vào các nghề nghiệp và học được cách giúp đỡ mọi người"; break;
   }
   
   try {

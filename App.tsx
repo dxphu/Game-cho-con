@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { GameInfo } from './types';
 import ToothGame from './games/ToothGame';
@@ -5,6 +6,7 @@ import ToySortingGame from './games/ToySortingGame';
 import PlantWateringGame from './games/PlantWateringGame';
 import ObstacleCourseGame from './games/ObstacleCourseGame';
 import BallTossGame from './games/BallTossGame';
+import RolePlayGame from './games/RolePlayGame';
 
 const SafeIcon: React.FC<{ src: string; fallback: string; className?: string }> = ({ src, fallback, className }) => {
   const [error, setError] = useState(false);
@@ -20,6 +22,14 @@ const GAMES: GameInfo[] = [
     fallback: '🪥',
     color: 'bg-blue-400',
     description: 'Giúp bé học cách làm sạch răng miệng.'
+  },
+  {
+    id: 'roleplay',
+    title: 'Đóng Vai Nghề Nghiệp',
+    icon: 'https://img.icons8.com/color/96/work.png',
+    fallback: '🎭',
+    color: 'bg-rose-400',
+    description: 'Bé làm bác sĩ, đầu bếp hoặc người bán hàng.'
   },
   {
     id: 'toys',
@@ -74,13 +84,13 @@ const App: React.FC = () => {
       case 'plants': return <PlantWateringGame />;
       case 'obstacle': return <ObstacleCourseGame />;
       case 'balltoss': return <BallTossGame />;
+      case 'roleplay': return <RolePlayGame />;
       default: return null;
     }
   };
 
   return (
     <div className="flex h-[100dvh] bg-sky-50 overflow-hidden font-['Quicksand'] relative">
-      {/* Main Game Area */}
       <main className="flex-1 flex flex-col min-w-0 bg-white md:bg-sky-50 transition-all duration-300">
         <header className="h-16 bg-white/80 backdrop-blur-md px-4 flex items-center justify-between border-b border-sky-100 z-20">
           <div className="flex items-center space-x-3 overflow-hidden">
@@ -95,7 +105,6 @@ const App: React.FC = () => {
               ⭐ 120
             </div>
             
-            {/* Mobile Toggle Button */}
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
               className="md:hidden p-2 rounded-xl bg-blue-50 text-blue-600 active:scale-90 transition-transform"
@@ -112,7 +121,6 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div 
           className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[40] md:hidden"
@@ -120,14 +128,12 @@ const App: React.FC = () => {
         />
       )}
 
-      {/* Sidebar - Right Side */}
       <aside className={`
         fixed top-0 right-0 h-full bg-white shadow-2xl z-[50] transition-all duration-300 ease-in-out flex flex-col
         ${isMobileMenuOpen ? 'translate-x-0 w-[80vw] max-w-[320px]' : 'translate-x-full w-[80vw] max-w-[320px]'}
         md:relative md:translate-x-0 md:shadow-none md:border-l md:border-sky-100
         ${isSidebarCollapsed ? 'md:w-20' : 'md:w-72'}
       `}>
-        {/* Sidebar Header */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-sky-100 shrink-0">
           {(!isSidebarCollapsed || isMobileMenuOpen) && (
             <span className="text-xl font-bold text-slate-800">Trò chơi</span>
@@ -142,7 +148,6 @@ const App: React.FC = () => {
           </button>
         </div>
 
-        {/* Game Navigation */}
         <nav className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
           {GAMES.map((game) => (
             <button
@@ -169,7 +174,6 @@ const App: React.FC = () => {
           ))}
         </nav>
 
-        {/* Desktop Collapse Toggle */}
         <div className="p-4 border-t border-sky-100 hidden md:block">
           <button 
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
