@@ -38,7 +38,11 @@ const TOY_POOL = [
   { id: 'rubber-duck', emoji: '🦆' }
 ];
 
-const ToySortingGame: React.FC = () => {
+interface ToySortingGameProps {
+  onAwardSticker: () => void;
+}
+
+const ToySortingGame: React.FC<ToySortingGameProps> = ({ onAwardSticker }) => {
   const [gameState, setGameState] = useState<GameState>('START');
   const [playerName, setPlayerName] = useState('');
   const [toys, setToys] = useState<Toy[]>([]);
@@ -50,7 +54,6 @@ const ToySortingGame: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const initGame = useCallback(() => {
-    // Ngẫu nhiên chọn 6 món từ pool
     const selected = [...TOY_POOL].sort(() => 0.5 - Math.random()).slice(0, 6);
     const newToys: Toy[] = selected.map((data, i) => ({
       id: i,
@@ -95,6 +98,7 @@ const ToySortingGame: React.FC = () => {
 
   const handleWin = async () => {
     setGameState('FINISHED');
+    onAwardSticker();
     setLoading(true);
     try {
       const [tipsData, msg] = await Promise.all([

@@ -16,7 +16,11 @@ const SafeImage: React.FC<{ src: string; alt: string; className?: string; fallba
   );
 };
 
-const BallTossGame: React.FC = () => {
+interface BallTossGameProps {
+  onAwardSticker: () => void;
+}
+
+const BallTossGame: React.FC<BallTossGameProps> = ({ onAwardSticker }) => {
   const [gameState, setGameState] = useState<GameState>('START');
   const [playerName, setPlayerName] = useState('');
   const [score, setScore] = useState(0);
@@ -52,6 +56,7 @@ const BallTossGame: React.FC = () => {
 
   const handleWin = useCallback(async () => {
     setGameState('FINISHED');
+    onAwardSticker();
     setLoading(true);
     try {
       const [tipsData, msg] = await Promise.all([
@@ -65,7 +70,7 @@ const BallTossGame: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [playerName]);
+  }, [playerName, onAwardSticker]);
 
   const onStartDrag = (clientX: number, clientY: number) => {
     if (isThrowing || gameState !== 'PLAYING') return;
@@ -80,21 +85,15 @@ const BallTossGame: React.FC = () => {
 
   const onEndDrag = (clientX: number, clientY: number) => {
     if (!dragStart || isThrowing) return;
-    
     const dy = clientY - dragStart.y;
     const dx = clientX - dragStart.x;
-    
-    // Chỉ ném nếu vuốt lên (dy âm)
     if (dy < -30) {
       setIsThrowing(true);
       setDragCurrent(null);
-      
-      const targetY = 20; // Độ cao của rổ
-      const targetX = 50 + (dx / 5); // Độ lệch ngang dựa trên vuốt
-      
+      const targetY = 20;
+      const targetX = 50 + (dx / 5);
       setTimeout(() => {
         setBallPos({ x: targetX, y: targetY });
-        
         setTimeout(() => {
           const isHit = Math.abs(targetX - basketX) < 12;
           if (isHit) {
@@ -102,9 +101,7 @@ const BallTossGame: React.FC = () => {
             setHitFeedback(true);
             setTimeout(() => setHitFeedback(false), 1000);
           }
-          
           setBallsLeft(prev => prev - 1);
-
           setTimeout(() => {
             if (ballsLeft <= 1) {
                handleWin();
@@ -124,23 +121,14 @@ const BallTossGame: React.FC = () => {
     }
   };
 
-  // Tính toán các thông số cho mũi tên vector
   const getVectorStyle = () => {
     if (!dragStart || !dragCurrent || isThrowing) return null;
     const dx = dragCurrent.x - dragStart.x;
     const dy = dragCurrent.y - dragStart.y;
-    
-    // Chỉ hiện mũi tên nếu bé đang vuốt lên
     if (dy >= 0) return null;
-
     const angle = Math.atan2(dy, dx) * (180 / Math.PI);
     const length = Math.min(Math.sqrt(dx * dx + dy * dy), 150);
-    
-    return {
-      angle: angle + 90, // Cộng 90 vì SVG arrow mặc định hướng lên
-      length,
-      opacity: Math.min(length / 30, 1)
-    };
+    return { angle: angle + 90, length, opacity: Math.min(length / 30, 1) };
   };
 
   const vector = getVectorStyle();
@@ -179,7 +167,6 @@ const BallTossGame: React.FC = () => {
 
       {gameState === 'PLAYING' && (
         <div className="w-full h-full relative overflow-hidden flex flex-col items-center">
-          {/* Thông tin game */}
           <div className="absolute top-4 w-full flex justify-around px-8 z-10">
             <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-2xl shadow-sm border border-yellow-100 flex items-center space-x-2">
               <span className="text-lg">⭐</span>
@@ -191,7 +178,6 @@ const BallTossGame: React.FC = () => {
             </div>
           </div>
 
-          {/* Rổ bóng */}
           <div 
             className="absolute transition-all duration-700 ease-in-out transform -translate-x-1/2"
             style={{ left: `${basketX}%`, top: '15%' }}
@@ -211,7 +197,6 @@ const BallTossGame: React.FC = () => {
             </div>
           </div>
 
-          {/* Mũi tên hướng dẫn (Vector) */}
           {vector && (
             <div 
               className="absolute pointer-events-none z-20 origin-bottom"
@@ -241,7 +226,6 @@ const BallTossGame: React.FC = () => {
             </div>
           )}
 
-          {/* Bóng */}
           <div 
             className={`absolute transition-all duration-500 transform -translate-x-1/2 -translate-y-1/2 ${isThrowing ? 'scale-75 blur-[0.5px]' : 'scale-100'}`}
             style={{ left: `${ballPos.x}%`, top: `${ballPos.y}%` }}

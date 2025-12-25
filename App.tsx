@@ -1,18 +1,28 @@
 
-import React, { useState } from 'react';
-import { GameInfo } from './types';
+import React, { useState, useEffect } from 'react';
+import { GameInfo, Sticker } from './types';
 import ToothGame from './games/ToothGame';
 import ToySortingGame from './games/ToySortingGame';
 import PlantWateringGame from './games/PlantWateringGame';
 import ObstacleCourseGame from './games/ObstacleCourseGame';
 import BallTossGame from './games/BallTossGame';
 import RolePlayGame from './games/RolePlayGame';
+import StickerBook from './components/StickerBook';
 
 const SafeIcon: React.FC<{ src: string; fallback: string; className?: string }> = ({ src, fallback, className }) => {
   const [error, setError] = useState(false);
   if (error) return <span className="text-2xl">{fallback}</span>;
   return <img src={src} onError={() => setError(true)} className={className} alt="icon" />;
 };
+
+const INITIAL_STICKERS: Sticker[] = [
+  { id: 'tooth_sticker', name: 'Dũng Sĩ Diệt Khuẩn', icon: 'https://img.icons8.com/color/144/toothbrush.png', description: 'Đánh răng sạch bóng!', unlocked: false },
+  { id: 'roleplay_sticker', name: 'Ngôi Sao Nhí', icon: 'https://img.icons8.com/color/144/work.png', description: 'Hoàn thành vai diễn!', unlocked: false },
+  { id: 'toy_sticker', name: 'Vua Ngăn Nắp', icon: 'https://img.icons8.com/color/144/teddy-bear.png', description: 'Đồ chơi thật gọn gàng!', unlocked: false },
+  { id: 'plant_sticker', name: 'Bạn Của Cây Xanh', icon: 'https://img.icons8.com/color/144/potted-plant.png', description: 'Tưới cây thật tươi!', unlocked: false },
+  { id: 'obstacle_sticker', name: 'Thỏ Nhanh Nhẹn', icon: 'https://img.icons8.com/color/144/running-rabbit.png', description: 'Vượt chướng ngại vật!', unlocked: false },
+  { id: 'ball_sticker', name: 'Siêu Sao Bóng Rổ', icon: 'https://img.icons8.com/color/144/basketball-net.png', description: 'Ném bóng cực đỉnh!', unlocked: false },
+];
 
 const GAMES: GameInfo[] = [
   {
@@ -21,7 +31,8 @@ const GAMES: GameInfo[] = [
     icon: 'https://img.icons8.com/color/96/toothbrush.png',
     fallback: '🪥',
     color: 'bg-sky-400',
-    description: 'Bé giúp bạn Răng luôn trắng sáng và thơm tho nhé!'
+    description: 'Bé giúp bạn Răng luôn trắng sáng và thơm tho nhé!',
+    stickerId: 'tooth_sticker'
   },
   {
     id: 'roleplay',
@@ -29,7 +40,8 @@ const GAMES: GameInfo[] = [
     icon: 'https://img.icons8.com/color/96/work.png',
     fallback: '🎭',
     color: 'bg-rose-400',
-    description: 'Hóa thân thành Bác sĩ, Đầu bếp tài ba nào.'
+    description: 'Hóa thân thành Bác sĩ, Đầu bếp tài ba nào.',
+    stickerId: 'roleplay_sticker'
   },
   {
     id: 'toys',
@@ -37,7 +49,8 @@ const GAMES: GameInfo[] = [
     icon: 'https://img.icons8.com/color/96/teddy-bear.png',
     fallback: '🧸',
     color: 'bg-amber-400',
-    description: 'Cùng dọn dẹp phòng thật ngăn nắp bé nhé!'
+    description: 'Cùng dọn dẹp phòng thật ngăn nắp bé nhé!',
+    stickerId: 'toy_sticker'
   },
   {
     id: 'plants',
@@ -45,7 +58,8 @@ const GAMES: GameInfo[] = [
     icon: 'https://img.icons8.com/color/96/potted-plant.png',
     fallback: '🪴',
     color: 'bg-emerald-400',
-    description: 'Chăm sóc những mầm xanh lớn thật nhanh.'
+    description: 'Chăm sóc những mầm xanh lớn thật nhanh.',
+    stickerId: 'plant_sticker'
   },
   {
     id: 'obstacle',
@@ -53,7 +67,8 @@ const GAMES: GameInfo[] = [
     icon: 'https://img.icons8.com/color/96/running-rabbit.png',
     fallback: '🐇',
     color: 'bg-indigo-400',
-    description: 'Vượt chướng ngại vật về đích thôi nào!'
+    description: 'Vượt chướng ngại vật về đích thôi nào!',
+    stickerId: 'obstacle_sticker'
   },
   {
     id: 'balltoss',
@@ -61,7 +76,8 @@ const GAMES: GameInfo[] = [
     icon: 'https://img.icons8.com/color/96/basketball-net.png',
     fallback: '🏀',
     color: 'bg-yellow-500',
-    description: 'Ném bóng thật chuẩn vào rổ nhé bé ơi!'
+    description: 'Ném bóng thật chuẩn vào rổ nhé bé ơi!',
+    stickerId: 'ball_sticker'
   }
 ];
 
@@ -69,22 +85,37 @@ const App: React.FC = () => {
   const [selectedGameId, setSelectedGameId] = useState<string>('tooth');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isStickerBookOpen, setIsStickerBookOpen] = useState(false);
+  const [stickers, setStickers] = useState<Sticker[]>(() => {
+    const saved = localStorage.getItem('kidplay_stickers');
+    return saved ? JSON.parse(saved) : INITIAL_STICKERS;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('kidplay_stickers', JSON.stringify(stickers));
+  }, [stickers]);
 
   const activeGame = GAMES.find(g => g.id === selectedGameId) || GAMES[0];
 
   const handleGameSelect = (id: string) => {
     setSelectedGameId(id);
     setIsMobileMenuOpen(false);
+    setIsStickerBookOpen(false);
+  };
+
+  const unlockSticker = (stickerId: string) => {
+    setStickers(prev => prev.map(s => s.id === stickerId ? { ...s, unlocked: true } : s));
   };
 
   const renderGame = () => {
+    const commonProps = { onAwardSticker: unlockSticker };
     switch (selectedGameId) {
-      case 'tooth': return <ToothGame />;
-      case 'toys': return <ToySortingGame />;
-      case 'plants': return <PlantWateringGame />;
-      case 'obstacle': return <ObstacleCourseGame />;
-      case 'balltoss': return <BallTossGame />;
-      case 'roleplay': return <RolePlayGame />;
+      case 'tooth': return <ToothGame onAwardSticker={() => unlockSticker('tooth_sticker')} />;
+      case 'toys': return <ToySortingGame onAwardSticker={() => unlockSticker('toy_sticker')} />;
+      case 'plants': return <PlantWateringGame onAwardSticker={() => unlockSticker('plant_sticker')} />;
+      case 'obstacle': return <ObstacleCourseGame onAwardSticker={() => unlockSticker('obstacle_sticker')} />;
+      case 'balltoss': return <BallTossGame onAwardSticker={() => unlockSticker('ball_sticker')} />;
+      case 'roleplay': return <RolePlayGame onAwardSticker={() => unlockSticker('roleplay_sticker')} />;
       default: return null;
     }
   };
@@ -104,9 +135,12 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-3">
-            <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-2xl shadow-md border-b-4 border-yellow-200 text-sm font-black text-slate-700 flex items-center">
-              <span className="mr-2 text-lg">⭐</span> 120
-            </div>
+            <button 
+              onClick={() => setIsStickerBookOpen(true)}
+              className="bg-white/90 backdrop-blur px-4 py-2 rounded-2xl shadow-md border-b-4 border-yellow-200 text-sm font-black text-slate-700 flex items-center hover:scale-105 active:scale-95 transition-all"
+            >
+              <span className="mr-2 text-xl">📔</span> {stickers.filter(s => s.unlocked).length} Huy Hiệu
+            </button>
             
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
@@ -121,6 +155,7 @@ const App: React.FC = () => {
 
         <div className="flex-1 relative overflow-hidden bg-white/20 rounded-t-[40px] shadow-2xl">
           {renderGame()}
+          {isStickerBookOpen && <StickerBook stickers={stickers} onClose={() => setIsStickerBookOpen(false)} />}
         </div>
       </main>
 
@@ -171,6 +206,21 @@ const App: React.FC = () => {
               )}
             </button>
           ))}
+          
+          <button
+            onClick={() => { setIsStickerBookOpen(true); setIsMobileMenuOpen(false); }}
+            className={`w-full flex items-center p-4 rounded-[32px] transition-all duration-300 group relative bg-yellow-400 text-white shadow-lg md:mt-10`}
+          >
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner bg-white/20 group-hover:scale-110 transition-all">
+              <span className="text-3xl">📔</span>
+            </div>
+            {(!isSidebarCollapsed || isMobileMenuOpen) && (
+              <div className="ml-4 text-left overflow-hidden">
+                <div className="font-black text-base leading-none mb-1 truncate">Sổ Sticker</div>
+                <div className="text-[11px] font-bold leading-tight opacity-80">Xem bộ sưu tập của bé</div>
+              </div>
+            )}
+          </button>
         </nav>
 
         <div className="p-6 hidden md:block border-t border-slate-100/50">

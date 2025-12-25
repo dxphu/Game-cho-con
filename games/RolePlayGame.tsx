@@ -21,7 +21,11 @@ const JOBS: JobData[] = [
   { id: 'cashier', title: 'Người Bán Hàng', emoji: '🛒', icon: 'https://img.icons8.com/color/144/cash-register.png', color: 'bg-green-500', bgColor: 'bg-green-50', task: 'Quét mã tính tiền' }
 ];
 
-const RolePlayGame: React.FC = () => {
+interface RolePlayGameProps {
+  onAwardSticker: () => void;
+}
+
+const RolePlayGame: React.FC<RolePlayGameProps> = ({ onAwardSticker }) => {
   const [gameState, setGameState] = useState<GameState>('START');
   const [playerName, setPlayerName] = useState('');
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -53,6 +57,7 @@ const RolePlayGame: React.FC = () => {
 
   const handleWin = async () => {
     setGameState('FINISHED');
+    onAwardSticker();
     setLoading(true);
     try {
       const currentJobTitle = JOBS.find(j => j.id === selectedJob)?.title || 'nghề nghiệp';
@@ -77,7 +82,6 @@ const RolePlayGame: React.FC = () => {
         return (
           <div className="flex flex-col items-center space-y-8 w-full">
             <div className="relative p-12 bg-white rounded-[40px] shadow-2xl border-b-8 border-blue-100 overflow-hidden">
-               {/* Họa tiết nền phòng khám */}
                <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#3b82f6 2px, transparent 2px)', backgroundSize: '30px 30px' }} />
                
                <img src="https://img.icons8.com/color/240/teddy-bear.png" className="w-48 h-48 md:w-64 md:h-64 relative z-10" alt="Teddy" />
@@ -159,7 +163,6 @@ const RolePlayGame: React.FC = () => {
 
   return (
     <div className={`w-full h-full flex flex-col items-center justify-center p-4 overflow-hidden relative transition-colors duration-700 ${gameState === 'PLAYING' ? jobInfo?.bgColor : 'bg-rose-50/20'}`}>
-      {/* Các hình khối trôi nổi trang trí */}
       <div className="absolute top-10 left-10 text-6xl opacity-10 animate-float-slow">🎨</div>
       <div className="absolute bottom-20 right-10 text-6xl opacity-10 animate-float-slow" style={{ animationDelay: '2s' }}>🎭</div>
       <div className="absolute top-1/2 left-20 text-4xl opacity-5 animate-float-slow" style={{ animationDelay: '4s' }}>✨</div>
@@ -206,7 +209,6 @@ const RolePlayGame: React.FC = () => {
 
       {gameState === 'PLAYING' && (
         <div className="w-full h-full flex flex-col items-center max-w-4xl relative">
-          {/* Header trong game */}
           <header className="w-full flex justify-between items-center px-4 py-6 z-20">
             <button 
               onClick={() => setGameState('START')} 
@@ -228,7 +230,6 @@ const RolePlayGame: React.FC = () => {
           <div className="flex-1 w-full flex flex-col items-center justify-center relative">
             {renderScenario()}
             
-            {/* Feedback tức thì */}
             {showReward && (
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] pointer-events-none scale-up-center">
                  <div className="bg-yellow-400 text-white font-black px-8 py-4 rounded-full shadow-2xl text-2xl border-4 border-white flex items-center">
@@ -238,7 +239,6 @@ const RolePlayGame: React.FC = () => {
             )}
           </div>
 
-          {/* Thanh tiến trình siêu nhân */}
           <div className="w-full max-w-md px-4 mb-10">
             <div className="relative h-6 bg-slate-200/50 rounded-full border-4 border-white shadow-inner overflow-hidden">
                <div 

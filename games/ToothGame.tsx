@@ -1,9 +1,42 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, Stain, DentalTip } from '../types';
 import Tooth from '../components/Tooth';
 import { getDentalTips, getCelebrationMessage } from '../services/geminiService';
 
-const ToothGame: React.FC = () => {
+interface ToothGameProps {
+  onAwardSticker: () => void;
+}
+
+const SafeBrush: React.FC<{ x: number, y: number, containerRef: React.RefObject<HTMLDivElement | null> }> = ({ x, y, containerRef }) => {
+  const [isError, setIsError] = useState(false);
+  
+  if (!containerRef.current) return null;
+  
+  const rect = containerRef.current.getBoundingClientRect();
+  const left = (x * rect.width) / 100 + rect.left;
+  const top = (y * rect.height) / 100 + rect.top;
+
+  return (
+    <div 
+      className="fixed pointer-events-none z-[60] -translate-x-1/2 -translate-y-1/2 transition-transform duration-75"
+      style={{ left: `${left}px`, top: `${top}px` }}
+    >
+      {!isError ? (
+        <img 
+          src="https://img.icons8.com/color/144/toothbrush.png" 
+          className="w-24 h-24 md:w-32 md:h-32 rotate-[15deg] drop-shadow-2xl" 
+          alt="Brush" 
+          onError={() => setIsError(true)}
+        />
+      ) : (
+        <span className="text-6xl md:text-8xl drop-shadow-2xl rotate-[15deg] block">🪥</span>
+      )}
+    </div>
+  );
+};
+
+const ToothGame: React.FC<ToothGameProps> = ({ onAwardSticker }) => {
   const [gameState, setGameState] = useState<GameState>('START');
   const [playerName, setPlayerName] = useState('');
   const [stains, setStains] = useState<Stain[]>([]);
@@ -21,7 +54,7 @@ const ToothGame: React.FC = () => {
         id: i,
         x: 25 + Math.random() * 50,
         y: 15 + Math.random() * 70,
-        size: 24 + Math.random() * 32, // To hơn một chút cho mobile dễ bấm
+        size: 24 + Math.random() * 32,
         isCleaned: false,
         type: types[Math.floor(Math.random() * types.length)],
       });
@@ -39,6 +72,7 @@ const ToothGame: React.FC = () => {
   const handleWin = useCallback(async () => {
     if (gameState !== 'PLAYING') return;
     setGameState('FINISHED');
+    onAwardSticker();
     setLoading(true);
     try {
       const [tipsData, msg] = await Promise.all([
@@ -52,7 +86,7 @@ const ToothGame: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [gameState, playerName]);
+  }, [gameState, playerName, onAwardSticker]);
 
   useEffect(() => {
     if (gameState === 'PLAYING' && stains.length > 0) {
@@ -111,15 +145,7 @@ const ToothGame: React.FC = () => {
              <Tooth stains={stains} onClean={cleanStain} brushPos={brushPos} />
           </div>
 
-          <div 
-            className="fixed pointer-events-none z-[60] -translate-x-1/2 -translate-y-1/2"
-            style={{ 
-              left: `${(brushPos.x * (containerRef.current?.clientWidth || 0)) / 100 + (containerRef.current?.getBoundingClientRect().left || 0)}px`,
-              top: `${(brushPos.y * (containerRef.current?.clientHeight || 0)) / 100 + (containerRef.current?.getBoundingClientRect().top || 0)}px`
-            }}
-          >
-            <img src="https://img.icons8.com/fluency/144/toothbrush.png" className="w-24 h-24 md:w-32 md:h-32 rotate-[15deg] drop-shadow-2xl" alt="Brush" />
-          </div>
+          <SafeBrush x={brushPos.x} y={brushPos.y} containerRef={containerRef} />
         </div>
       )}
 

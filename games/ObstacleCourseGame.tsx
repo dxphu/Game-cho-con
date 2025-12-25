@@ -16,7 +16,11 @@ const SafeImage: React.FC<{ src: string; alt: string; className?: string; fallba
   );
 };
 
-const ObstacleCourseGame: React.FC = () => {
+interface ObstacleCourseGameProps {
+  onAwardSticker: () => void;
+}
+
+const ObstacleCourseGame: React.FC<ObstacleCourseGameProps> = ({ onAwardSticker }) => {
   const [gameState, setGameState] = useState<GameState>('START');
   const [playerName, setPlayerName] = useState('');
   const [charPos, setCharPos] = useState({ x: 50, y: 90 });
@@ -47,6 +51,7 @@ const ObstacleCourseGame: React.FC = () => {
   const handleWin = useCallback(async () => {
     setIsDragging(false);
     setGameState('FINISHED');
+    onAwardSticker();
     setLoading(true);
     try {
       const [tipsData, msg] = await Promise.all([
@@ -60,9 +65,8 @@ const ObstacleCourseGame: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [playerName]);
+  }, [playerName, onAwardSticker]);
 
-  // Use useEffect to monitor win conditions and avoid stale state in event handlers
   useEffect(() => {
     if (gameState === 'PLAYING' && charPos.y < 10 && obstacles.length > 0 && obstacles.every(o => o.isPassed)) {
       handleWin();
@@ -74,14 +78,9 @@ const ObstacleCourseGame: React.FC = () => {
     const rect = containerRef.current.getBoundingClientRect();
     const x = ((clientX - rect.left) / rect.width) * 100;
     const y = ((clientY - rect.top) / rect.height) * 100;
-
-    // Giới hạn trong vùng chơi
     const boundedX = Math.max(10, Math.min(90, x));
     const boundedY = Math.max(5, Math.min(95, y));
-
     setCharPos({ x: boundedX, y: boundedY });
-
-    // Kiểm tra vượt chướng ngại vật
     setObstacles(prev => prev.map(obs => {
       const dist = Math.sqrt(Math.pow(obs.x - x, 2) + Math.pow(obs.y - y, 2));
       if (dist < 10) return { ...obs, isPassed: true };
@@ -123,7 +122,6 @@ const ObstacleCourseGame: React.FC = () => {
 
       {gameState === 'PLAYING' && (
         <div className="w-full h-full relative overflow-hidden">
-          {/* Đường băng dính (Tape Path) */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
              <path 
                d="M 50 95 L 50 85 L 30 70 L 70 45 L 50 10" 
@@ -135,13 +133,11 @@ const ObstacleCourseGame: React.FC = () => {
              />
           </svg>
 
-          {/* Vạch đích */}
           <div className="absolute top-4 left-1/2 -translate-x-1/2 flex flex-col items-center">
             <SafeImage src="https://img.icons8.com/color/96/finish-flag.png" className="w-16 h-16" alt="Finish" fallbackEmoji="🏁" />
             <div className="text-purple-600 font-bold text-sm bg-white/80 px-3 py-1 rounded-full border border-purple-100">ĐÍCH ĐẾN</div>
           </div>
 
-          {/* Chướng ngại vật */}
           {obstacles.map(obs => (
             <div 
               key={obs.id}
@@ -158,7 +154,6 @@ const ObstacleCourseGame: React.FC = () => {
             </div>
           ))}
 
-          {/* Nhân vật điều khiển */}
           <div 
             className={`absolute transition-transform duration-150 cursor-grab active:cursor-grabbing z-50 transform -translate-x-1/2 -translate-y-1/2 ${isDragging ? 'scale-125' : ''}`}
             style={{ left: `${charPos.x}%`, top: `${charPos.y}%` }}

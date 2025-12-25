@@ -30,4 +30,13 @@ export interface GameInfo {
   fallback?: string;
   color: string;
   description: string;
+  stickerId?: string;
+}
+
+export interface Sticker {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  unlocked: boolean;
 }

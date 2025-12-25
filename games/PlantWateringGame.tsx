@@ -32,7 +32,11 @@ const PLANT_VARIANTS = [
   { id: 'deciduous-tree', emoji: '🌳', name: 'Cây Xanh' }
 ];
 
-const PlantWateringGame: React.FC = () => {
+interface PlantWateringGameProps {
+  onAwardSticker: () => void;
+}
+
+const PlantWateringGame: React.FC<PlantWateringGameProps> = ({ onAwardSticker }) => {
   const [gameState, setGameState] = useState<GameState>('START');
   const [playerName, setPlayerName] = useState('');
   const [growth, setGrowth] = useState(0); 
@@ -47,11 +51,8 @@ const PlantWateringGame: React.FC = () => {
   const handleStart = (e: React.FormEvent) => {
     e.preventDefault();
     if (!playerName.trim()) return;
-    
-    // Ngẫu nhiên hóa loại cây cho lượt này
     const randomVariant = PLANT_VARIANTS[Math.floor(Math.random() * PLANT_VARIANTS.length)];
     setCurrentVariant(randomVariant);
-    
     setGameState('PLAYING');
     setGrowth(0);
   };
@@ -93,6 +94,7 @@ const PlantWateringGame: React.FC = () => {
 
   const handleWin = async () => {
     setGameState('FINISHED');
+    onAwardSticker();
     setLoading(true);
     try {
       const [tipsData, msg] = await Promise.all([
@@ -138,7 +140,6 @@ const PlantWateringGame: React.FC = () => {
 
       {gameState === 'PLAYING' && (
         <div className="w-full h-full relative flex flex-col items-center justify-center cursor-none">
-          {/* Thanh sức sống */}
           <div className="absolute top-8 w-64 h-8 bg-white rounded-full shadow-inner overflow-hidden border-2 border-green-200">
             <div 
               className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-300"
@@ -165,7 +166,6 @@ const PlantWateringGame: React.FC = () => {
             )}
           </div>
 
-          {/* Bình tưới */}
           <div 
             className="fixed pointer-events-none z-50 transition-transform duration-75"
             style={{ 
