@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, Stain, DentalTip } from '../types';
 import Tooth from '../components/Tooth';
 import { getDentalTips, getCelebrationMessage } from '../services/geminiService';
+import { ASSETS } from '../constants/assets';
 
 interface ToothGameProps {
   onAwardSticker: () => void;
@@ -24,7 +25,7 @@ const SafeBrush: React.FC<{ x: number, y: number, containerRef: React.RefObject<
     >
       {!isError ? (
         <img 
-          src="https://img.icons8.com/color/144/toothbrush.png" 
+          src={ASSETS.TOOLS.TOOTHBRUSH} 
           className="w-24 h-24 md:w-32 md:h-32 rotate-[15deg] drop-shadow-2xl" 
           alt="Brush" 
           onError={() => setIsError(true)}
@@ -151,7 +152,7 @@ const ToothGame: React.FC<ToothGameProps> = ({ onAwardSticker }) => {
 
       {gameState === 'FINISHED' && (
         <div className="max-w-2xl w-full bg-white rounded-3xl p-6 md:p-8 shadow-2xl text-center border-b-8 border-green-400 z-50 overflow-y-auto max-h-[85vh] custom-scrollbar">
-          <img src="https://img.icons8.com/color/144/medal.png" className="w-24 h-24 mx-auto mb-4 animate-bounce" alt="Winner" />
+          <img src={ASSETS.UI.MEDAL} className="w-24 h-24 mx-auto mb-4 animate-bounce" alt="Winner" />
           <h2 className="text-2xl md:text-3xl font-bold text-green-600 mb-2">Quá giỏi luôn!</h2>
           <p className="text-base md:text-lg text-slate-700 italic mb-6 leading-relaxed">
             {loading ? "Đang chờ quà..." : celebrationMsg}

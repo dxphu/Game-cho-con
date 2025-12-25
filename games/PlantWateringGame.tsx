@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { GameState, DentalTip } from '../types';
 import { getPlantCareTips, getCelebrationMessage } from '../services/geminiService';
+import { ASSETS } from '../constants/assets';
 
 const SafeImage: React.FC<{ src: string; alt: string; className?: string; fallbackEmoji: string }> = ({ src, alt, className, fallbackEmoji }) => {
   const [isError, setIsError] = useState(false);
@@ -24,12 +24,12 @@ const SafeImage: React.FC<{ src: string; alt: string; className?: string; fallba
 };
 
 const PLANT_VARIANTS = [
-  { id: 'sunflower', emoji: '🌻', name: 'Hoa Hướng Dương' },
-  { id: 'cactus', emoji: '🌵', name: 'Cây Xương Rồng' },
-  { id: 'rose', emoji: '🌹', name: 'Hoa Hồng' },
-  { id: 'flower-pot', emoji: '🪴', name: 'Cây Trong Chậu' },
-  { id: 'tulip', emoji: '🌷', name: 'Hoa Tulip' },
-  { id: 'deciduous-tree', emoji: '🌳', name: 'Cây Xanh' }
+  { id: 'SUNFLOWER', emoji: '🌻', name: 'Hoa Hướng Dương' },
+  { id: 'CACTUS', emoji: '🌵', name: 'Cây Xương Rồng' },
+  { id: 'ROSE', emoji: '🌹', name: 'Hoa Hồng' },
+  { id: 'POTTED', emoji: '🪴', name: 'Cây Trong Chậu' },
+  { id: 'TULIP', emoji: '🌷', name: 'Hoa Tulip' },
+  { id: 'TREE', emoji: '🌳', name: 'Cây Xanh' }
 ];
 
 interface PlantWateringGameProps {
@@ -152,7 +152,7 @@ const PlantWateringGame: React.FC<PlantWateringGameProps> = ({ onAwardSticker })
 
           <div className="relative mt-20 transition-all duration-500 transform" style={{ transform: `scale(${0.9 + (growth / 150)})` }}>
             <SafeImage 
-              src={growth < 30 ? 'https://img.icons8.com/color/96/seedling.png' : (growth < 70 ? 'https://img.icons8.com/color/96/potted-plant.png' : `https://img.icons8.com/color/96/${currentVariant.id}.png`)}
+              src={growth < 30 ? ASSETS.PLANTS.SEEDLING : (growth < 70 ? ASSETS.PLANTS.POTTED : (ASSETS.PLANTS as any)[currentVariant.id])}
               alt="plant" 
               className={`w-48 h-48 md:w-64 md:h-64 ${isWatering ? 'animate-pulse' : ''}`}
               fallbackEmoji={growth < 70 ? "🌱" : currentVariant.emoji}
@@ -175,7 +175,7 @@ const PlantWateringGame: React.FC<PlantWateringGameProps> = ({ onAwardSticker })
             }}
           >
             <SafeImage 
-              src="https://img.icons8.com/color/96/watering-can.png" 
+              src={ASSETS.TOOLS.WATERING_CAN} 
               className="w-24 h-24 drop-shadow-2xl" 
               alt="Watering Can" 
               fallbackEmoji="🚿"
@@ -191,7 +191,7 @@ const PlantWateringGame: React.FC<PlantWateringGameProps> = ({ onAwardSticker })
       {gameState === 'FINISHED' && (
         <div className="max-w-2xl w-full bg-white rounded-3xl p-8 shadow-xl text-center border-b-8 border-green-400 z-10 mx-4 overflow-y-auto max-h-[90vh]">
           <div className="relative mb-6">
-            <SafeImage src={`https://img.icons8.com/color/144/${currentVariant.id}.png`} className="w-32 h-32 mx-auto animate-bounce" alt="Winner" fallbackEmoji={currentVariant.emoji} />
+            <SafeImage src={ASSETS.UI.MEDAL} className="w-32 h-32 mx-auto animate-bounce" alt="Winner" fallbackEmoji="🎖️" />
           </div>
           <h2 className="text-3xl font-bold text-green-600 mb-2">Bé thật mát tay!</h2>
           <p className="text-lg text-slate-700 italic mb-6">{loading ? "Đang chờ quà..." : celebrationMsg}</p>

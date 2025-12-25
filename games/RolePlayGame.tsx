@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameState, DentalTip } from '../types';
 import { getRolePlayTips, getCelebrationMessage } from '../services/geminiService';
+import { ASSETS } from '../constants/assets';
 
 type Job = 'doctor' | 'chef' | 'cashier';
 
@@ -16,9 +17,9 @@ interface JobData {
 }
 
 const JOBS: JobData[] = [
-  { id: 'doctor', title: 'Bác Sĩ Nhí', emoji: '🩺', icon: 'https://img.icons8.com/color/144/doctor-male.png', color: 'bg-blue-500', bgColor: 'bg-blue-50', task: 'Khám bệnh cho Gấu bông' },
-  { id: 'chef', title: 'Đầu Bếp Tài Ba', emoji: '🧑‍🍳', icon: 'https://img.icons8.com/color/144/chef-hat.png', color: 'bg-orange-500', bgColor: 'bg-orange-50', task: 'Nấu súp rau củ' },
-  { id: 'cashier', title: 'Người Bán Hàng', emoji: '🛒', icon: 'https://img.icons8.com/color/144/cash-register.png', color: 'bg-green-500', bgColor: 'bg-green-50', task: 'Quét mã tính tiền' }
+  { id: 'doctor', title: 'Bác Sĩ Nhí', emoji: '🩺', icon: ASSETS.CHARACTERS.DOCTOR, color: 'bg-blue-500', bgColor: 'bg-blue-50', task: 'Khám bệnh cho Gấu bông' },
+  { id: 'chef', title: 'Đầu Bếp Tài Ba', emoji: '🧑‍🍳', icon: ASSETS.CHARACTERS.CHEF, color: 'bg-orange-500', bgColor: 'bg-orange-50', task: 'Nấu súp rau củ' },
+  { id: 'cashier', title: 'Người Bán Hàng', emoji: '🛒', icon: ASSETS.UI.CASH_REGISTER, color: 'bg-green-500', bgColor: 'bg-green-50', task: 'Quét mã tính tiền' }
 ];
 
 interface RolePlayGameProps {
@@ -84,19 +85,23 @@ const RolePlayGame: React.FC<RolePlayGameProps> = ({ onAwardSticker }) => {
             <div className="relative p-12 bg-white rounded-[40px] shadow-2xl border-b-8 border-blue-100 overflow-hidden">
                <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#3b82f6 2px, transparent 2px)', backgroundSize: '30px 30px' }} />
                
-               <img src="https://img.icons8.com/color/240/teddy-bear.png" className="w-48 h-48 md:w-64 md:h-64 relative z-10" alt="Teddy" />
+               <img src={ASSETS.CHARACTERS.TEDDY} className="w-48 h-48 md:w-64 md:h-64 relative z-10" alt="Teddy" />
                {taskProgress < 50 && <span className="absolute top-8 right-8 text-5xl animate-bounce">🤒</span>}
                {taskProgress >= 100 && <span className="absolute top-8 right-8 text-5xl">💖</span>}
             </div>
             <div className="flex space-x-6">
-              {['Stethoscope', 'Thermometer', 'Bandage'].map((item, idx) => (
+              {[
+                { name: 'Stethoscope', icon: ASSETS.TOOLS.STETHOSCOPE },
+                { name: 'Thermometer', icon: ASSETS.TOOLS.THERMOMETER },
+                { name: 'Bandage', icon: ASSETS.TOOLS.BANDAGE }
+              ].map((item, idx) => (
                 <button 
-                  key={item} 
+                  key={item.name} 
                   onClick={completeTask}
                   disabled={taskProgress >= (idx + 1) * 33}
                   className={`group relative p-6 rounded-3xl shadow-lg border-2 transition-all ${taskProgress >= (idx + 1) * 33 ? 'bg-slate-100 border-transparent grayscale' : 'bg-white border-blue-200 hover:scale-110 active:scale-95'}`}
                 >
-                  <img src={`https://img.icons8.com/color/96/${item.toLowerCase()}.png`} className="w-16 h-16" alt={item} />
+                  <img src={item.icon} className="w-16 h-16" alt={item.name} />
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white">{idx + 1}</div>
                 </button>
               ))}
@@ -109,18 +114,22 @@ const RolePlayGame: React.FC<RolePlayGameProps> = ({ onAwardSticker }) => {
             <div className="relative p-12 bg-white rounded-[40px] shadow-2xl border-b-8 border-orange-100 overflow-hidden">
                <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(45deg, #f97316 25%, transparent 25%, transparent 75%, #f97316 75%, #f97316), linear-gradient(45deg, #f97316 25%, transparent 25%, transparent 75%, #f97316 75%, #f97316)', backgroundSize: '40px 40px', backgroundPosition: '0 0, 20px 20px' }} />
                
-               <img src="https://img.icons8.com/color/240/cooking-pot.png" className={`w-48 h-48 md:w-64 md:h-64 relative z-10 ${taskProgress > 0 ? 'animate-bounce' : ''}`} alt="Pot" />
+               <img src={ASSETS.UI.POT} className={`w-48 h-48 md:w-64 md:h-64 relative z-10 ${taskProgress > 0 ? 'animate-bounce' : ''}`} alt="Pot" />
                {taskProgress > 0 && <div className="absolute top-6 left-1/2 -translate-x-1/2 flex space-x-2 animate-pulse z-20"><span className="text-3xl">♨️</span><span className="text-3xl">♨️</span></div>}
             </div>
             <div className="flex space-x-6">
-              {['Carrot', 'Tomato', 'Broccoli'].map((food, idx) => (
+              {[
+                { name: 'Carrot', icon: ASSETS.FOOD.CARROT },
+                { name: 'Tomato', icon: ASSETS.FOOD.TOMATO },
+                { name: 'Broccoli', icon: ASSETS.FOOD.BROCCOLI }
+              ].map((food, idx) => (
                 <button 
-                  key={food} 
+                  key={food.name} 
                   onClick={completeTask}
                   disabled={taskProgress >= (idx + 1) * 33}
                   className={`group relative p-6 rounded-3xl shadow-lg border-2 transition-all ${taskProgress >= (idx + 1) * 33 ? 'bg-slate-100 border-transparent grayscale' : 'bg-white border-orange-200 hover:scale-110 active:scale-95'}`}
                 >
-                  <img src={`https://img.icons8.com/color/96/${food.toLowerCase()}.png`} className="w-16 h-16" alt={food} />
+                  <img src={food.icon} className="w-16 h-16" alt={food.name} />
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white">{idx + 1}</div>
                 </button>
               ))}
@@ -133,16 +142,20 @@ const RolePlayGame: React.FC<RolePlayGameProps> = ({ onAwardSticker }) => {
              <div className="relative p-12 bg-white rounded-[40px] shadow-2xl border-b-8 border-green-100 flex flex-col items-center w-full max-w-sm overflow-hidden">
                 <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#22c55e 2px, transparent 2px)', backgroundSize: '25px 25px' }} />
                 
-                <img src="https://img.icons8.com/color/144/shopping-cart.png" className="w-32 h-32 mb-6 relative z-10" alt="Cart" />
+                <img src={ASSETS.UI.CART} className="w-32 h-32 mb-6 relative z-10" alt="Cart" />
                 <div className="text-4xl font-black text-green-600 font-mono tracking-tighter relative z-10">
                    {taskProgress === 0 ? '00.00' : `${Math.floor(taskProgress * 123)}đ`}
                 </div>
                 <div className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-1">Hóa đơn điện tử</div>
              </div>
              <div className="flex space-x-6">
-              {['Milk', 'Bread', 'Apple'].map((item, idx) => (
+              {[
+                { name: 'Milk', icon: ASSETS.FOOD.MILK },
+                { name: 'Bread', icon: ASSETS.FOOD.BREAD },
+                { name: 'Apple', icon: ASSETS.FOOD.APPLE }
+              ].map((item, idx) => (
                 <button 
-                  key={item} 
+                  key={item.name} 
                   onClick={() => {
                     completeTask();
                     window.navigator.vibrate?.(40);
@@ -150,7 +163,7 @@ const RolePlayGame: React.FC<RolePlayGameProps> = ({ onAwardSticker }) => {
                   disabled={taskProgress >= (idx + 1) * 33}
                   className={`group relative p-6 rounded-3xl shadow-lg border-2 transition-all ${taskProgress >= (idx + 1) * 33 ? 'bg-slate-100 border-transparent grayscale' : 'bg-white border-green-200 hover:scale-110 active:scale-95'}`}
                 >
-                  <img src={`https://img.icons8.com/color/96/${item.toLowerCase()}.png`} className="w-16 h-16" alt={item} />
+                  <img src={item.icon} className="w-16 h-16" alt={item.name} />
                   <div className="text-[10px] font-black mt-2 text-green-700 bg-green-50 px-2 py-0.5 rounded-full">SCAN IT</div>
                 </button>
               ))}
@@ -170,7 +183,7 @@ const RolePlayGame: React.FC<RolePlayGameProps> = ({ onAwardSticker }) => {
       {gameState === 'START' && (
         <div className="max-w-md w-full bg-white rounded-[40px] p-8 md:p-12 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] text-center border-t-8 border-rose-400 z-10">
           <div className="w-24 h-24 bg-rose-100 rounded-3xl flex items-center justify-center mx-auto mb-6 rotate-3">
-             <img src="https://img.icons8.com/color/96/work.png" className="w-16 h-16" alt="Work" />
+             <img src={ASSETS.UI.WORK} className="w-16 h-16" alt="Work" />
           </div>
           <h1 className="text-4xl font-extrabold text-slate-800 mb-2">Bé Tập Đóng Vai</h1>
           <p className="text-slate-500 mb-10 text-lg">Hôm nay bé muốn giúp đỡ mọi người với vai trò nào?</p>

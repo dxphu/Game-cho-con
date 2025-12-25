@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, DentalTip } from '../types';
 import { getBallTossTips, getCelebrationMessage } from '../services/geminiService';
+import { ASSETS } from '../constants/assets';
 
 const SafeImage: React.FC<{ src: string; alt: string; className?: string; fallbackEmoji: string }> = ({ src, alt, className, fallbackEmoji }) => {
   const [isError, setIsError] = useState(false);
@@ -146,7 +146,7 @@ const BallTossGame: React.FC<BallTossGameProps> = ({ onAwardSticker }) => {
     >
       {gameState === 'START' && (
         <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-xl text-center border-t-8 border-yellow-400 z-10 mx-4">
-          <SafeImage src="https://img.icons8.com/color/96/basketball-net.png" className="w-24 h-24 mx-auto mb-4" alt="Basket" fallbackEmoji="🏀" />
+          <SafeImage src={ASSETS.SPORTS.BASKET} className="w-24 h-24 mx-auto mb-4" alt="Basket" fallbackEmoji="🏀" />
           <h1 className="text-3xl font-bold text-yellow-600 mb-2">Siêu Thủ Ném Bóng</h1>
           <p className="text-slate-500 mb-8 text-sm">Vuốt từ quả bóng lên phía trên để ném vào rổ nhé!</p>
           <form onSubmit={handleStart} className="space-y-6">
@@ -184,7 +184,7 @@ const BallTossGame: React.FC<BallTossGameProps> = ({ onAwardSticker }) => {
           >
             <div className="relative">
                <SafeImage 
-                 src="https://img.icons8.com/color/144/basketball-net.png" 
+                 src={ASSETS.SPORTS.BASKET} 
                  className={`w-32 h-32 md:w-40 md:h-40 transition-transform ${hitFeedback ? 'scale-125' : 'scale-100'}`} 
                  alt="Basket" 
                  fallbackEmoji="🧺" 
@@ -232,7 +232,7 @@ const BallTossGame: React.FC<BallTossGameProps> = ({ onAwardSticker }) => {
           >
             <div className="relative group">
               <SafeImage 
-                src="https://img.icons8.com/color/96/basketball.png" 
+                src={ASSETS.SPORTS.BALL} 
                 className={`w-20 h-20 md:w-24 md:h-24 drop-shadow-xl ${isThrowing ? 'animate-spin' : ''}`} 
                 alt="Ball" 
                 fallbackEmoji="🏀" 

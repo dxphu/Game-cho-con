@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, DentalTip } from '../types';
 import { getToySortingTips, getCelebrationMessage } from '../services/geminiService';
+import { ASSETS } from '../constants/assets';
 
 const SafeImage: React.FC<{ src: string; alt: string; className?: string; fallbackEmoji: string }> = ({ src, alt, className, fallbackEmoji }) => {
   const [isError, setIsError] = useState(false);
@@ -26,16 +26,16 @@ interface Toy {
 }
 
 const TOY_POOL = [
-  { id: 'teddy-bear', emoji: '🧸' },
-  { id: 'toy-car', emoji: '🚗' },
-  { id: 'beach-ball', emoji: '⚽' },
-  { id: 'rubiks-cube', emoji: '🧊' },
-  { id: 'toy-train', emoji: '🚂' },
-  { id: 'rocking-horse', emoji: '🎠' },
-  { id: 'blocks', emoji: '🧱' },
-  { id: 'paper-plane', emoji: '✈️' },
-  { id: 'robot', emoji: '🤖' },
-  { id: 'rubber-duck', emoji: '🦆' }
+  { id: 'BEAR', emoji: '🧸' },
+  { id: 'CAR', emoji: '🚗' },
+  { id: 'BALL', emoji: '⚽' },
+  { id: 'CUBE', emoji: '🧊' },
+  { id: 'TRAIN', emoji: '🚂' },
+  { id: 'HORSE', emoji: '🎠' },
+  { id: 'BLOCKS', emoji: '🧱' },
+  { id: 'PLANE', emoji: '✈️' },
+  { id: 'ROBOT', emoji: '🤖' },
+  { id: 'DUCK', emoji: '🦆' }
 ];
 
 interface ToySortingGameProps {
@@ -57,7 +57,7 @@ const ToySortingGame: React.FC<ToySortingGameProps> = ({ onAwardSticker }) => {
     const selected = [...TOY_POOL].sort(() => 0.5 - Math.random()).slice(0, 6);
     const newToys: Toy[] = selected.map((data, i) => ({
       id: i,
-      icon: `https://img.icons8.com/color/96/${data.id}.png`,
+      icon: (ASSETS.TOYS as any)[data.id],
       emoji: data.emoji,
       x: 15 + Math.random() * 70,
       y: 10 + Math.random() * 40,
@@ -154,7 +154,7 @@ const ToySortingGame: React.FC<ToySortingGameProps> = ({ onAwardSticker }) => {
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-48 h-48 md:w-64 md:h-64 flex flex-col items-center justify-end">
              <div className="text-orange-800 font-bold mb-2 bg-orange-200/50 px-4 py-1 rounded-full text-sm uppercase">Hòm đồ chơi 📦</div>
              <SafeImage 
-               src="https://img.icons8.com/color/240/cardboard-box.png" 
+               src={ASSETS.UI.BOX} 
                className={`w-full h-full transition-transform ${activeToyId !== null ? 'scale-110' : ''}`}
                alt="Toy Box" 
                fallbackEmoji="📦"
@@ -185,7 +185,7 @@ const ToySortingGame: React.FC<ToySortingGameProps> = ({ onAwardSticker }) => {
 
       {gameState === 'FINISHED' && (
         <div className="max-w-2xl w-full bg-white rounded-3xl p-8 shadow-xl text-center border-b-8 border-orange-400 z-10 mx-4 overflow-y-auto max-h-[90vh]">
-          <SafeImage src="https://img.icons8.com/color/96/medal.png" className="w-24 h-24 mx-auto mb-4 animate-bounce" alt="Winner" fallbackEmoji="🏅" />
+          <SafeImage src={ASSETS.UI.MEDAL} className="w-24 h-24 mx-auto mb-4 animate-bounce" alt="Winner" fallbackEmoji="🏅" />
           <h2 className="text-3xl font-bold text-orange-600 mb-2">Bé thật ngăn nắp!</h2>
           <p className="text-lg text-slate-700 italic mb-6">{celebrationMsg}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">

@@ -8,6 +8,7 @@ import ObstacleCourseGame from './games/ObstacleCourseGame';
 import BallTossGame from './games/BallTossGame';
 import RolePlayGame from './games/RolePlayGame';
 import StickerBook from './components/StickerBook';
+import { ASSETS } from './constants/assets';
 
 const SafeIcon: React.FC<{ src: string; fallback: string; className?: string }> = ({ src, fallback, className }) => {
   const [error, setError] = useState(false);
@@ -16,19 +17,19 @@ const SafeIcon: React.FC<{ src: string; fallback: string; className?: string }> 
 };
 
 const INITIAL_STICKERS: Sticker[] = [
-  { id: 'tooth_sticker', name: 'Dũng Sĩ Diệt Khuẩn', icon: 'https://img.icons8.com/color/144/toothbrush.png', description: 'Đánh răng sạch bóng!', unlocked: false },
-  { id: 'roleplay_sticker', name: 'Ngôi Sao Nhí', icon: 'https://img.icons8.com/color/144/work.png', description: 'Hoàn thành vai diễn!', unlocked: false },
-  { id: 'toy_sticker', name: 'Vua Ngăn Nắp', icon: 'https://img.icons8.com/color/144/teddy-bear.png', description: 'Đồ chơi thật gọn gàng!', unlocked: false },
-  { id: 'plant_sticker', name: 'Bạn Của Cây Xanh', icon: 'https://img.icons8.com/color/144/potted-plant.png', description: 'Tưới cây thật tươi!', unlocked: false },
-  { id: 'obstacle_sticker', name: 'Thỏ Nhanh Nhẹn', icon: 'https://img.icons8.com/color/144/running-rabbit.png', description: 'Vượt chướng ngại vật!', unlocked: false },
-  { id: 'ball_sticker', name: 'Siêu Sao Bóng Rổ', icon: 'https://img.icons8.com/color/144/basketball-net.png', description: 'Ném bóng cực đỉnh!', unlocked: false },
+  { id: 'tooth_sticker', name: 'Dũng Sĩ Diệt Khuẩn', icon: ASSETS.TOOLS.TOOTHBRUSH, description: 'Đánh răng sạch bóng!', unlocked: false },
+  { id: 'roleplay_sticker', name: 'Ngôi Sao Nhí', icon: ASSETS.UI.WORK, description: 'Hoàn thành vai diễn!', unlocked: false },
+  { id: 'toy_sticker', name: 'Vua Ngăn Nắp', icon: ASSETS.TOYS.BEAR, description: 'Đồ chơi thật gọn gàng!', unlocked: false },
+  { id: 'plant_sticker', name: 'Bạn Của Cây Xanh', icon: ASSETS.PLANTS.POTTED, description: 'Tưới cây thật tươi!', unlocked: false },
+  { id: 'obstacle_sticker', name: 'Thỏ Nhanh Nhẹn', icon: ASSETS.CHARACTERS.RABBIT, description: 'Vượt chướng ngại vật!', unlocked: false },
+  { id: 'ball_sticker', name: 'Siêu Sao Bóng Rổ', icon: ASSETS.SPORTS.BASKET, description: 'Ném bóng cực đỉnh!', unlocked: false },
 ];
 
 const GAMES: GameInfo[] = [
   {
     id: 'tooth',
     title: 'Đánh Răng Xinh',
-    icon: 'https://img.icons8.com/color/96/toothbrush.png',
+    icon: ASSETS.TOOLS.TOOTHBRUSH,
     fallback: '🪥',
     color: 'bg-sky-400',
     description: 'Bé giúp bạn Răng luôn trắng sáng và thơm tho nhé!',
@@ -37,7 +38,7 @@ const GAMES: GameInfo[] = [
   {
     id: 'roleplay',
     title: 'Bé Tập Đóng Vai',
-    icon: 'https://img.icons8.com/color/96/work.png',
+    icon: ASSETS.UI.WORK,
     fallback: '🎭',
     color: 'bg-rose-400',
     description: 'Hóa thân thành Bác sĩ, Đầu bếp tài ba nào.',
@@ -46,7 +47,7 @@ const GAMES: GameInfo[] = [
   {
     id: 'toys',
     title: 'Sắp Xếp Đồ Chơi',
-    icon: 'https://img.icons8.com/color/96/teddy-bear.png',
+    icon: ASSETS.TOYS.BEAR,
     fallback: '🧸',
     color: 'bg-amber-400',
     description: 'Cùng dọn dẹp phòng thật ngăn nắp bé nhé!',
@@ -55,7 +56,7 @@ const GAMES: GameInfo[] = [
   {
     id: 'plants',
     title: 'Tưới Cây Xanh',
-    icon: 'https://img.icons8.com/color/96/potted-plant.png',
+    icon: ASSETS.PLANTS.POTTED,
     fallback: '🪴',
     color: 'bg-emerald-400',
     description: 'Chăm sóc những mầm xanh lớn thật nhanh.',
@@ -64,7 +65,7 @@ const GAMES: GameInfo[] = [
   {
     id: 'obstacle',
     title: 'Đường Đua Nhí',
-    icon: 'https://img.icons8.com/color/96/running-rabbit.png',
+    icon: ASSETS.CHARACTERS.RABBIT,
     fallback: '🐇',
     color: 'bg-indigo-400',
     description: 'Vượt chướng ngại vật về đích thôi nào!',
@@ -73,7 +74,7 @@ const GAMES: GameInfo[] = [
   {
     id: 'balltoss',
     title: 'Siêu Thủ Ném Bóng',
-    icon: 'https://img.icons8.com/color/96/basketball-net.png',
+    icon: ASSETS.SPORTS.BASKET,
     fallback: '🏀',
     color: 'bg-yellow-500',
     description: 'Ném bóng thật chuẩn vào rổ nhé bé ơi!',
@@ -108,7 +109,6 @@ const App: React.FC = () => {
   };
 
   const renderGame = () => {
-    const commonProps = { onAwardSticker: unlockSticker };
     switch (selectedGameId) {
       case 'tooth': return <ToothGame onAwardSticker={() => unlockSticker('tooth_sticker')} />;
       case 'toys': return <ToySortingGame onAwardSticker={() => unlockSticker('toy_sticker')} />;
@@ -159,12 +159,10 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Overlay mobile */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[40] md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
       )}
 
-      {/* Sidebar / Drawer */}
       <aside className={`
         fixed top-0 right-0 h-full bg-white/95 backdrop-blur-xl shadow-2xl z-[50] transition-all duration-500 ease-in-out flex flex-col
         ${isMobileMenuOpen ? 'translate-x-0 w-[85vw] max-w-[350px]' : 'translate-x-full w-[85vw] max-w-[350px]'}

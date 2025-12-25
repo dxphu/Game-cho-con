@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, DentalTip, Obstacle } from '../types';
 import { getObstacleCourseTips, getCelebrationMessage } from '../services/geminiService';
+import { ASSETS } from '../constants/assets';
 
 const SafeImage: React.FC<{ src: string; alt: string; className?: string; fallbackEmoji: string }> = ({ src, alt, className, fallbackEmoji }) => {
   const [isError, setIsError] = useState(false);
@@ -100,7 +100,7 @@ const ObstacleCourseGame: React.FC<ObstacleCourseGameProps> = ({ onAwardSticker 
       {gameState === 'START' && (
         <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-xl text-center border-t-8 border-purple-400 z-10 mx-4">
           <div className="mb-4">
-            <SafeImage src="https://img.icons8.com/color/96/running-rabbit.png" alt="Hero" className="w-24 h-24 mx-auto" fallbackEmoji="🐇" />
+            <SafeImage src={ASSETS.CHARACTERS.RABBIT} alt="Hero" className="w-24 h-24 mx-auto" fallbackEmoji="🐇" />
           </div>
           <h1 className="text-3xl font-bold text-purple-600 mb-2">Đường Đua Tại Gia</h1>
           <p className="text-slate-500 mb-8">Bé hãy giúp bạn Thỏ vượt qua các chướng ngại vật để về đích nhé!</p>
@@ -134,7 +134,7 @@ const ObstacleCourseGame: React.FC<ObstacleCourseGameProps> = ({ onAwardSticker 
           </svg>
 
           <div className="absolute top-4 left-1/2 -translate-x-1/2 flex flex-col items-center">
-            <SafeImage src="https://img.icons8.com/color/96/finish-flag.png" className="w-16 h-16" alt="Finish" fallbackEmoji="🏁" />
+            <SafeImage src={ASSETS.UI.FINISH_FLAG} className="w-16 h-16" alt="Finish" fallbackEmoji="🏁" />
             <div className="text-purple-600 font-bold text-sm bg-white/80 px-3 py-1 rounded-full border border-purple-100">ĐÍCH ĐẾN</div>
           </div>
 
@@ -145,7 +145,7 @@ const ObstacleCourseGame: React.FC<ObstacleCourseGameProps> = ({ onAwardSticker 
               style={{ left: `${obs.x}%`, top: `${obs.y}%` }}
             >
               <SafeImage 
-                src={obs.type === 'pillow' ? 'https://img.icons8.com/color/96/pillows.png' : 'https://img.icons8.com/color/96/chair.png'} 
+                src={obs.type === 'pillow' ? ASSETS.OBSTACLES.PILLOW : ASSETS.OBSTACLES.CHAIR} 
                 className="w-20 h-20 md:w-28 md:h-28" 
                 alt={obs.type} 
                 fallbackEmoji={obs.type === 'pillow' ? '🛏️' : '🪑'} 
@@ -162,7 +162,7 @@ const ObstacleCourseGame: React.FC<ObstacleCourseGameProps> = ({ onAwardSticker 
           >
             <div className="relative">
               <SafeImage 
-                src="https://img.icons8.com/color/96/running-rabbit.png" 
+                src={ASSETS.CHARACTERS.RABBIT} 
                 className="w-24 h-24 drop-shadow-lg" 
                 alt="Player" 
                 fallbackEmoji="🐇" 
@@ -183,7 +183,7 @@ const ObstacleCourseGame: React.FC<ObstacleCourseGameProps> = ({ onAwardSticker 
 
       {gameState === 'FINISHED' && (
         <div className="max-w-2xl w-full bg-white rounded-3xl p-8 shadow-xl text-center border-b-8 border-purple-400 z-10 mx-4 overflow-y-auto max-h-[90vh]">
-          <SafeImage src="https://img.icons8.com/color/96/medal.png" className="w-24 h-24 mx-auto mb-4 animate-bounce" alt="Winner" fallbackEmoji="🏅" />
+          <SafeImage src={ASSETS.UI.MEDAL} className="w-24 h-24 mx-auto mb-4 animate-bounce" alt="Winner" fallbackEmoji="🏅" />
           <h2 className="text-3xl font-bold text-purple-600 mb-2">Bé thật dũng cảm!</h2>
           <p className="text-lg text-slate-700 italic mb-6">{loading ? "Đang xem thành tích..." : celebrationMsg}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
