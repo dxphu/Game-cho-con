@@ -9,6 +9,14 @@ interface ToothProps {
   isWinning?: boolean;
 }
 
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  type: '✨' | '🫧' | '☁️';
+  dx: number;
+}
+
 type BacteriaType = keyof typeof ASSETS.BACTERIA;
 const BACTERIA_KEYS: BacteriaType[] = ['👾', '🦠', '🧬', '🐛'];
 
@@ -33,7 +41,8 @@ const SafeBacteria: React.FC<{ emoji: BacteriaType; size: number }> = ({ emoji, 
 };
 
 const Tooth: React.FC<ToothProps> = ({ stains, onClean, brushPos, isWinning = false }) => {
-  const [sparkles, setSparkles] = useState<{id: number, x: number, y: number}[]>([]);
+  const [particles, setParticles] = useState<Particle[]>([]);
+  const [lastCleanTime, setLastCleanTime] = useState(0);
 
   const bacteriaMap = useMemo(() => {
     const map: Record<number, BacteriaType> = {};
@@ -46,27 +55,54 @@ const Tooth: React.FC<ToothProps> = ({ stains, onClean, brushPos, isWinning = fa
   useEffect(() => {
     if (isWinning) return;
     const brushRadius = 12; 
+    let cleanedAny = false;
+
     stains.forEach(stain => {
       if (!stain.isCleaned) {
         const dx = brushPos.x - stain.x;
         const dy = brushPos.y - stain.y;
         if (Math.sqrt(dx * dx + dy * dy) < brushRadius) {
           onClean(stain.id);
-          const newSparkle = { id: Date.now() + Math.random(), x: stain.x, y: stain.y };
-          setSparkles(prev => [...prev, newSparkle]);
+          cleanedAny = true;
+
+          // Spawn burst of satisfying particles
+          const newParticles: Particle[] = Array.from({ length: 3 + Math.floor(Math.random() * 3) }).map(() => ({
+            id: Date.now() + Math.random(),
+            x: stain.x,
+            y: stain.y,
+            type: ['✨', '🫧', '☁️'][Math.floor(Math.random() * 3)] as any,
+            dx: (Math.random() - 0.5) * 40 // spread
+          }));
+
+          setParticles(prev => [...prev, ...newParticles]);
+          
+          // Cleanup particles after animation
           setTimeout(() => {
-            setSparkles(prev => prev.filter(s => s.id !== newSparkle.id));
-          }, 600);
+            const ids = newParticles.map(p => p.id);
+            setParticles(prev => prev.filter(p => !ids.includes(p.id)));
+          }, 800);
         }
       }
     });
+
+    if (cleanedAny) {
+      setLastCleanTime(Date.now());
+      // Simple haptic feedback if supported
+      if ('vibrate' in navigator) {
+        navigator.vibrate(20);
+      }
+    }
   }, [brushPos, stains, onClean, isWinning]);
 
   return (
     <div className={`relative w-80 h-96 md:w-[480px] md:h-[580px] flex items-center justify-center transition-transform duration-500 ${isWinning ? 'victory-tooth' : ''}`}>
       <div className="absolute top-[10%] w-[90%] h-[25%] bg-rose-200 rounded-t-[100px] -z-10 shadow-inner border-b-4 border-rose-300 opacity-80" />
       
-      <svg viewBox="0 0 200 240" className="w-full h-full drop-shadow-[0_20px_50px_rgba(0,0,0,0.1)]">
+      <svg 
+        key={lastCleanTime}
+        viewBox="0 0 200 240" 
+        className={`w-full h-full drop-shadow-[0_20px_50px_rgba(0,0,0,0.1)] ${lastCleanTime > 0 && !isWinning ? 'tooth-react' : ''}`}
+      >
         <path
           d="M40,60 C40,20 160,20 160,60 C160,110 155,160 145,210 C140,230 115,230 110,210 C105,190 95,190 90,210 C85,230 60,230 55,210 C45,160 40,110 40,60 Z"
           fill={isWinning ? "#fffef0" : "white"}
@@ -115,13 +151,17 @@ const Tooth: React.FC<ToothProps> = ({ stains, onClean, brushPos, isWinning = fa
         </div>
       ))}
 
-      {sparkles.map(s => (
+      {particles.map(p => (
         <div 
-          key={s.id} 
-          className="absolute sparkle-effect z-30 pointer-events-none"
-          style={{ left: `${s.x}%`, top: `${s.y}%` }}
+          key={p.id} 
+          className="absolute bubble-particle z-30 pointer-events-none text-2xl"
+          style={{ 
+            left: `${p.x}%`, 
+            top: `${p.y}%`,
+            '--tw-translate-x': `${p.dx}px`,
+          } as any}
         >
-          <span className="text-2xl">✨</span>
+          {p.type}
         </div>
       ))}
 
