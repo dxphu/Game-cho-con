@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { GameInfo } from './types';
 import ToothGame from './games/ToothGame';
 import ToySortingGame from './games/ToySortingGame';
@@ -10,58 +10,58 @@ import RolePlayGame from './games/RolePlayGame';
 
 const SafeIcon: React.FC<{ src: string; fallback: string; className?: string }> = ({ src, fallback, className }) => {
   const [error, setError] = useState(false);
-  if (error) return <span className="text-xl">{fallback}</span>;
+  if (error) return <span className="text-2xl">{fallback}</span>;
   return <img src={src} onError={() => setError(true)} className={className} alt="icon" />;
 };
 
 const GAMES: GameInfo[] = [
   {
     id: 'tooth',
-    title: 'Bé Tập Đánh Răng',
+    title: 'Đánh Răng Xinh',
     icon: 'https://img.icons8.com/color/96/toothbrush.png',
     fallback: '🪥',
-    color: 'bg-blue-400',
-    description: 'Giúp bé học cách làm sạch răng miệng.'
+    color: 'bg-sky-400',
+    description: 'Bé giúp bạn Răng luôn trắng sáng và thơm tho nhé!'
   },
   {
     id: 'roleplay',
-    title: 'Đóng Vai Nghề Nghiệp',
+    title: 'Bé Tập Đóng Vai',
     icon: 'https://img.icons8.com/color/96/work.png',
     fallback: '🎭',
     color: 'bg-rose-400',
-    description: 'Bé làm bác sĩ, đầu bếp hoặc người bán hàng.'
+    description: 'Hóa thân thành Bác sĩ, Đầu bếp tài ba nào.'
   },
   {
     id: 'toys',
     title: 'Sắp Xếp Đồ Chơi',
     icon: 'https://img.icons8.com/color/96/teddy-bear.png',
     fallback: '🧸',
-    color: 'bg-orange-400',
-    description: 'Học cách dọn dẹp phòng ngăn nắp.'
+    color: 'bg-amber-400',
+    description: 'Cùng dọn dẹp phòng thật ngăn nắp bé nhé!'
   },
   {
     id: 'plants',
     title: 'Tưới Cây Xanh',
     icon: 'https://img.icons8.com/color/96/potted-plant.png',
     fallback: '🪴',
-    color: 'bg-green-400',
-    description: 'Chăm sóc môi trường xung quanh.'
+    color: 'bg-emerald-400',
+    description: 'Chăm sóc những mầm xanh lớn thật nhanh.'
   },
   {
     id: 'obstacle',
-    title: 'Vượt Chướng Ngại Vật',
+    title: 'Đường Đua Nhí',
     icon: 'https://img.icons8.com/color/96/running-rabbit.png',
     fallback: '🐇',
-    color: 'bg-purple-400',
-    description: 'Rèn luyện kỹ năng vận động thô tại gia.'
+    color: 'bg-indigo-400',
+    description: 'Vượt chướng ngại vật về đích thôi nào!'
   },
   {
     id: 'balltoss',
-    title: 'Ném Bóng Vào Rổ',
+    title: 'Siêu Thủ Ném Bóng',
     icon: 'https://img.icons8.com/color/96/basketball-net.png',
     fallback: '🏀',
     color: 'bg-yellow-500',
-    description: 'Rèn luyện sự khéo léo và khả năng ước lượng.'
+    description: 'Ném bóng thật chuẩn vào rổ nhé bé ơi!'
   }
 ];
 
@@ -91,81 +91,80 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-[100dvh] bg-sky-50 overflow-hidden font-['Quicksand'] relative">
-      <main className="flex-1 flex flex-col min-w-0 bg-white md:bg-sky-50 transition-all duration-300">
-        <header className="h-16 bg-white/80 backdrop-blur-md px-4 flex items-center justify-between border-b border-sky-100 z-20">
-          <div className="flex items-center space-x-3 overflow-hidden">
-            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm shrink-0">K</div>
-            <h1 className="font-bold text-slate-800 text-base md:text-xl truncate">
-              {activeGame.title}
-            </h1>
+      <main className="flex-1 flex flex-col min-w-0 bg-white/50 backdrop-blur-xl md:bg-transparent transition-all duration-300">
+        <header className="h-20 px-6 flex items-center justify-between z-30">
+          <div className="flex items-center space-x-4 overflow-hidden">
+            <div className="w-12 h-12 bg-white rounded-2xl shadow-lg flex items-center justify-center border-b-4 border-blue-100 rotate-3 shrink-0">
+               <span className="text-2xl font-black text-blue-500">K</span>
+            </div>
+            <div className="flex flex-col">
+              <h1 className="font-black text-slate-800 text-xl leading-none">{activeGame.title}</h1>
+              <span className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">KidPlay Hub ✨</span>
+            </div>
           </div>
           
-          <div className="flex items-center space-x-2">
-            <div className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold flex items-center shadow-sm">
-              ⭐ 120
+          <div className="flex items-center space-x-3">
+            <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-2xl shadow-md border-b-4 border-yellow-200 text-sm font-black text-slate-700 flex items-center">
+              <span className="mr-2 text-lg">⭐</span> 120
             </div>
             
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden p-2 rounded-xl bg-blue-50 text-blue-600 active:scale-90 transition-transform"
+              className="md:hidden w-12 h-12 flex items-center justify-center rounded-2xl bg-blue-500 text-white shadow-lg active:scale-90 transition-transform"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
           </div>
         </header>
 
-        <div className="flex-1 relative overflow-hidden">
+        <div className="flex-1 relative overflow-hidden bg-white/20 rounded-t-[40px] shadow-2xl">
           {renderGame()}
         </div>
       </main>
 
+      {/* Overlay mobile */}
       {isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[40] md:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[40] md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
       )}
 
+      {/* Sidebar / Drawer */}
       <aside className={`
-        fixed top-0 right-0 h-full bg-white shadow-2xl z-[50] transition-all duration-300 ease-in-out flex flex-col
-        ${isMobileMenuOpen ? 'translate-x-0 w-[80vw] max-w-[320px]' : 'translate-x-full w-[80vw] max-w-[320px]'}
-        md:relative md:translate-x-0 md:shadow-none md:border-l md:border-sky-100
-        ${isSidebarCollapsed ? 'md:w-20' : 'md:w-72'}
+        fixed top-0 right-0 h-full bg-white/95 backdrop-blur-xl shadow-2xl z-[50] transition-all duration-500 ease-in-out flex flex-col
+        ${isMobileMenuOpen ? 'translate-x-0 w-[85vw] max-w-[350px]' : 'translate-x-full w-[85vw] max-w-[350px]'}
+        md:relative md:translate-x-0 md:shadow-none md:border-l md:border-white/50
+        ${isSidebarCollapsed ? 'md:w-24' : 'md:w-80'}
       `}>
-        <div className="h-16 flex items-center justify-between px-6 border-b border-sky-100 shrink-0">
+        <div className="h-24 flex items-center justify-between px-8 shrink-0">
           {(!isSidebarCollapsed || isMobileMenuOpen) && (
-            <span className="text-xl font-bold text-slate-800">Trò chơi</span>
+            <span className="text-2xl font-black text-slate-800 tracking-tighter italic">VUI CHƠI <span className="text-blue-500 underline decoration-4 decoration-blue-100 underline-offset-4">THÔI!</span></span>
           )}
-          <button 
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="md:hidden p-2 text-slate-400 hover:text-slate-600"
-          >
+          <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+        <nav className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
           {GAMES.map((game) => (
             <button
               key={game.id}
               onClick={() => handleGameSelect(game.id)}
-              className={`w-full flex items-center p-3 rounded-2xl transition-all duration-200 group ${
+              className={`w-full flex items-center p-4 rounded-[32px] transition-all duration-300 group relative ${
                 selectedGameId === game.id 
-                ? `${game.color} text-white shadow-lg` 
-                : 'hover:bg-sky-50 text-slate-600'
+                ? `${game.color} text-white shadow-[0_15px_30px_-5px_rgba(0,0,0,0.2)] scale-[1.02] z-10` 
+                : 'bg-white hover:bg-slate-50 text-slate-600 shadow-sm border-b-4 border-slate-100'
               }`}
             >
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
-                <SafeIcon src={game.icon} fallback={game.fallback || '🎮'} className="w-8 h-8 object-contain" />
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 group-hover:rotate-6 transition-all ${selectedGameId === game.id ? 'bg-white/20' : 'bg-slate-50'}`}>
+                <SafeIcon src={game.icon} fallback={game.fallback || '🎮'} className="w-10 h-10 object-contain" />
               </div>
               {(!isSidebarCollapsed || isMobileMenuOpen) && (
-                <div className="ml-3 text-left overflow-hidden">
-                  <div className="font-bold text-sm leading-tight truncate">{game.title}</div>
-                  <div className={`text-[10px] truncate opacity-80 ${selectedGameId === game.id ? 'text-white' : 'text-slate-400'}`}>
+                <div className="ml-4 text-left overflow-hidden">
+                  <div className="font-black text-base leading-none mb-1 truncate">{game.title}</div>
+                  <div className={`text-[11px] font-bold leading-tight opacity-80 ${selectedGameId === game.id ? 'text-white' : 'text-slate-400'}`}>
                     {game.description.split('.')[0]}
                   </div>
                 </div>
@@ -174,21 +173,21 @@ const App: React.FC = () => {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-sky-100 hidden md:block">
+        <div className="p-6 hidden md:block border-t border-slate-100/50">
           <button 
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="w-full flex items-center justify-center p-2 rounded-xl text-slate-400 hover:bg-sky-50 hover:text-blue-500 transition-colors"
+            className="w-full flex items-center justify-center py-4 rounded-2xl bg-slate-100/50 text-slate-400 hover:text-blue-500 hover:bg-blue-50 transition-all font-bold"
           >
             {isSidebarCollapsed ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
               </svg>
             ) : (
-              <div className="flex items-center space-x-2 text-sm font-bold">
-                <span>Thu gọn</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7" />
+              <div className="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                 </svg>
+                <span>THU GỌN LẠI</span>
               </div>
             )}
           </button>
