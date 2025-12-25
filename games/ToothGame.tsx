@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, Stain, DentalTip } from '../types';
 import Tooth from '../components/Tooth';
@@ -45,6 +44,7 @@ const ToothGame: React.FC<ToothGameProps> = ({ onAwardSticker }) => {
   const [tips, setTips] = useState<DentalTip[]>([]);
   const [celebrationMsg, setCelebrationMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isCelebrating, setIsCelebrating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const initGame = useCallback(() => {
@@ -61,6 +61,7 @@ const ToothGame: React.FC<ToothGameProps> = ({ onAwardSticker }) => {
       });
     }
     setStains(newStains);
+    setIsCelebrating(false);
     setGameState('PLAYING');
   }, []);
 
@@ -72,33 +73,42 @@ const ToothGame: React.FC<ToothGameProps> = ({ onAwardSticker }) => {
 
   const handleWin = useCallback(async () => {
     if (gameState !== 'PLAYING') return;
-    setGameState('FINISHED');
+    
+    // Trigger celebration animation first
+    setIsCelebrating(true);
+    
+    // Award sticker early but keep visual flow
     onAwardSticker();
-    setLoading(true);
-    try {
-      const [tipsData, msg] = await Promise.all([
-        getDentalTips(),
-        getCelebrationMessage(playerName)
-      ]);
-      setTips(tipsData);
-      setCelebrationMsg(msg);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+    
+    // Transition after a short delay
+    setTimeout(async () => {
+      setGameState('FINISHED');
+      setLoading(true);
+      try {
+        const [tipsData, msg] = await Promise.all([
+          getDentalTips(),
+          getCelebrationMessage(playerName)
+        ]);
+        setTips(tipsData);
+        setCelebrationMsg(msg);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }, 2500);
   }, [gameState, playerName, onAwardSticker]);
 
   useEffect(() => {
-    if (gameState === 'PLAYING' && stains.length > 0) {
+    if (gameState === 'PLAYING' && stains.length > 0 && !isCelebrating) {
       if (stains.every(s => s.isCleaned)) {
         handleWin();
       }
     }
-  }, [stains, gameState, handleWin]);
+  }, [stains, gameState, handleWin, isCelebrating]);
 
   const updateBrushPos = (clientX: number, clientY: number) => {
-    if (gameState !== 'PLAYING' || !containerRef.current) return;
+    if (gameState !== 'PLAYING' || isCelebrating || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = ((clientX - rect.left) / rect.width) * 100;
     const y = ((clientY - rect.top) / rect.height) * 100;
@@ -106,13 +116,14 @@ const ToothGame: React.FC<ToothGameProps> = ({ onAwardSticker }) => {
   };
 
   const cleanStain = useCallback((id: number) => {
+    if (isCelebrating) return;
     setStains(prev => prev.map(s => s.id === id ? { ...s, isCleaned: true } : s));
-  }, []);
+  }, [isCelebrating]);
 
   return (
     <div 
       ref={containerRef}
-      className={`w-full h-full flex flex-col items-center justify-center p-4 relative ${gameState === 'PLAYING' ? 'cursor-none touch-none' : ''}`}
+      className={`w-full h-full flex flex-col items-center justify-center p-4 relative ${gameState === 'PLAYING' && !isCelebrating ? 'cursor-none touch-none' : ''}`}
       onMouseMove={(e) => updateBrushPos(e.clientX, e.clientY)}
       onTouchMove={(e) => updateBrushPos(e.touches[0].clientX, e.touches[0].clientY)}
     >
@@ -138,15 +149,39 @@ const ToothGame: React.FC<ToothGameProps> = ({ onAwardSticker }) => {
 
       {gameState === 'PLAYING' && (
         <div className="relative flex flex-col items-center w-full max-w-lg">
-          <div className="mb-6 bg-white/90 backdrop-blur px-6 py-2 rounded-full shadow-md border border-blue-100 animate-pulse">
-            <span className="text-lg md:text-xl font-bold text-blue-600">🦠 Còn {stains.filter(s => !s.isCleaned).length} bạn vi khuẩn</span>
-          </div>
+          {!isCelebrating ? (
+            <div className="mb-6 bg-white/90 backdrop-blur px-6 py-2 rounded-full shadow-md border border-blue-100 animate-pulse">
+              <span className="text-lg md:text-xl font-bold text-blue-600">🦠 Còn {stains.filter(s => !s.isCleaned).length} bạn vi khuẩn</span>
+            </div>
+          ) : (
+            <div className="mb-6 bg-yellow-400 px-8 py-3 rounded-full shadow-xl border-4 border-white animate-bounce">
+              <span className="text-xl md:text-2xl font-black text-white italic tracking-tighter">XUẤT SẮC QUÁ BÉ ƠI! 🌟</span>
+            </div>
+          )}
           
           <div className="w-full aspect-square flex justify-center items-center">
-             <Tooth stains={stains} onClean={cleanStain} brushPos={brushPos} />
+             <Tooth stains={stains} onClean={cleanStain} brushPos={brushPos} isWinning={isCelebrating} />
           </div>
 
-          <SafeBrush x={brushPos.x} y={brushPos.y} containerRef={containerRef} />
+          {!isCelebrating && <SafeBrush x={brushPos.x} y={brushPos.y} containerRef={containerRef} />}
+          
+          {isCelebrating && (
+            <div className="absolute inset-0 pointer-events-none z-[100] flex items-center justify-center">
+               {Array.from({ length: 15 }).map((_, i) => (
+                 <div 
+                   key={`confetti-${i}`}
+                   className="confetti text-4xl"
+                   style={{
+                     left: `${Math.random() * 100}%`,
+                     animationDelay: `${Math.random() * 1}s`,
+                     color: ['#fbbf24', '#3b82f6', '#10b981', '#f43f5e'][Math.floor(Math.random() * 4)]
+                   }}
+                 >
+                   {['🎉', '✨', '⭐', '🎊'][Math.floor(Math.random() * 4)]}
+                 </div>
+               ))}
+            </div>
+          )}
         </div>
       )}
 

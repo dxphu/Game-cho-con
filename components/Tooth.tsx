@@ -6,9 +6,9 @@ interface ToothProps {
   stains: Stain[];
   onClean: (id: number) => void;
   brushPos: { x: number; y: number };
+  isWinning?: boolean;
 }
 
-// Fixed: Deriving BacteriaType from ASSETS.BACTERIA which now has properly quoted keys
 type BacteriaType = keyof typeof ASSETS.BACTERIA;
 const BACTERIA_KEYS: BacteriaType[] = ['👾', '🦠', '🧬', '🐛'];
 
@@ -32,7 +32,7 @@ const SafeBacteria: React.FC<{ emoji: BacteriaType; size: number }> = ({ emoji, 
   );
 };
 
-const Tooth: React.FC<ToothProps> = ({ stains, onClean, brushPos }) => {
+const Tooth: React.FC<ToothProps> = ({ stains, onClean, brushPos, isWinning = false }) => {
   const [sparkles, setSparkles] = useState<{id: number, x: number, y: number}[]>([]);
 
   const bacteriaMap = useMemo(() => {
@@ -44,6 +44,7 @@ const Tooth: React.FC<ToothProps> = ({ stains, onClean, brushPos }) => {
   }, [stains.length]);
 
   useEffect(() => {
+    if (isWinning) return;
     const brushRadius = 12; 
     stains.forEach(stain => {
       if (!stain.isCleaned) {
@@ -59,26 +60,40 @@ const Tooth: React.FC<ToothProps> = ({ stains, onClean, brushPos }) => {
         }
       }
     });
-  }, [brushPos, stains, onClean]);
+  }, [brushPos, stains, onClean, isWinning]);
 
   return (
-    <div className="relative w-80 h-96 md:w-[480px] md:h-[580px] flex items-center justify-center">
+    <div className={`relative w-80 h-96 md:w-[480px] md:h-[580px] flex items-center justify-center transition-transform duration-500 ${isWinning ? 'victory-tooth' : ''}`}>
       <div className="absolute top-[10%] w-[90%] h-[25%] bg-rose-200 rounded-t-[100px] -z-10 shadow-inner border-b-4 border-rose-300 opacity-80" />
       
       <svg viewBox="0 0 200 240" className="w-full h-full drop-shadow-[0_20px_50px_rgba(0,0,0,0.1)]">
         <path
           d="M40,60 C40,20 160,20 160,60 C160,110 155,160 145,210 C140,230 115,230 110,210 C105,190 95,190 90,210 C85,230 60,230 55,210 C45,160 40,110 40,60 Z"
-          fill="white"
-          stroke="#e2e8f0"
-          strokeWidth="3"
+          fill={isWinning ? "#fffef0" : "white"}
+          stroke={isWinning ? "#fbbf24" : "#e2e8f0"}
+          strokeWidth={isWinning ? "5" : "3"}
+          className="transition-colors duration-1000"
         />
-        <path d="M50,70 Q100,60 150,70" fill="none" stroke="#f1f5f9" strokeWidth="10" strokeLinecap="round" opacity="0.4" />
-        <path d="M140,80 Q145,130 135,180" fill="none" stroke="#f8fafc" strokeWidth="5" strokeLinecap="round" />
-        <circle cx="75" cy="100" r="7" fill="#334155" />
-        <circle cx="125" cy="100" r="7" fill="#334155" />
-        <circle cx="77" cy="98" r="2" fill="white" />
-        <circle cx="127" cy="98" r="2" fill="white" />
-        <path d="M80,135 Q100,155 120,135" fill="none" stroke="#f43f5e" strokeWidth="5" strokeLinecap="round" />
+        <path d="M50,70 Q100,60 150,70" fill="none" stroke={isWinning ? "#fef3c7" : "#f1f5f9"} strokeWidth="10" strokeLinecap="round" opacity="0.4" />
+        <path d="M140,80 Q145,130 135,180" fill="none" stroke="#f8fafc" strokeWidth="5" strokeLinecap="round" opacity={isWinning ? 0.8 : 1} />
+        
+        {/* Eyes */}
+        <g className={isWinning ? 'animate-bounce' : ''} style={{ transformOrigin: 'center' }}>
+          <circle cx="75" cy="100" r="7" fill="#334155" />
+          <circle cx="125" cy="100" r="7" fill="#334155" />
+          <circle cx="77" cy="98" r="2" fill="white" />
+          <circle cx="127" cy="98" r="2" fill="white" />
+        </g>
+
+        {/* Mouth */}
+        <path 
+          d={isWinning ? "M70,140 Q100,170 130,140" : "M80,135 Q100,155 120,135"} 
+          fill="none" 
+          stroke={isWinning ? "#e11d48" : "#f43f5e"} 
+          strokeWidth={isWinning ? "8" : "5"} 
+          strokeLinecap="round" 
+        />
+        
         <circle cx="60" cy="120" r="10" fill="#fda4af" opacity="0.4" />
         <circle cx="140" cy="120" r="10" fill="#fda4af" opacity="0.4" />
       </svg>
@@ -107,6 +122,21 @@ const Tooth: React.FC<ToothProps> = ({ stains, onClean, brushPos }) => {
           style={{ left: `${s.x}%`, top: `${s.y}%` }}
         >
           <span className="text-2xl">✨</span>
+        </div>
+      ))}
+
+      {isWinning && Array.from({ length: 12 }).map((_, i) => (
+        <div 
+          key={`win-sparkle-${i}`}
+          className="absolute text-3xl animate-ping z-40 pointer-events-none"
+          style={{ 
+            left: `${30 + Math.random() * 40}%`, 
+            top: `${20 + Math.random() * 60}%`,
+            animationDelay: `${i * 0.1}s`,
+            animationDuration: '2s'
+          }}
+        >
+          ✨
         </div>
       ))}
     </div>
